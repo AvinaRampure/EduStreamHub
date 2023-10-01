@@ -72,12 +72,12 @@ router.get('/settings/deleteStudent/:id', requireAuth, controller.deleteStudent)
 
 // 4.CLASSES (subjects mapping courses ,staffs and section)
 // 4.1 Select class
-router.get('/getClass', requireAuth, controller.getClass);
+router.get('/getAllVideo', requireAuth, controller.getAllVideo);
 // 4.2 Add class
 router.get('/addVideo', requireAuth, controller.getVideo);
 router.post('/addVideo',requireAuth ,upload.any(), controller.postVideo);
 // 4.3 Modify existing classes
-router.get('/settings/class/:id', requireAuth, controller.getClassSettings);
+router.get('/edit/video/:id', requireAuth, controller.getEditVideo);
 router.post('/settings/class', requireAuth, controller.postClassSettings);
 router.get('/settings/deleteClass/:id', requireAuth, controller.deleteClass);
 

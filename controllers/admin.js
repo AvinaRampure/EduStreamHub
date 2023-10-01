@@ -25,12 +25,12 @@ const { promisify } = require('util');
 const formate = "YYYY-MM-DD"
 
 const admin = require('firebase-admin');
-const serviceAccount = require('../utils/firstproject-b9354-firebase-adminsdk-a6zup-71213c5f71.json');
+const serviceAccount = require('../utils/edustream-hub-firebase-adminsdk-rru81-b5c6445df6.json');
 const { error } = require('console');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'gs://firstproject-b9354.appspot.com',
+  storageBucket: 'gs://edustream-hub.appspot.com',
 });
 
 const storage = admin.storage();
@@ -773,23 +773,25 @@ exports.postStudentSettings = async (req, res, next) => {
 // 4. CLASSES
 
 // 4.1 Select Class
-exports.getClass = async (req, res, next) => {
+exports.getAllVideo = async (req, res, next) => {
 
-  const results = await classModel.find()
-  const staffData = [];
-  for (const result of results) {
+  let data = await videoModel.find({});
 
-    const staffName = await staffModel.findOne({
-      email: result.st_id
-    })
-    if (staffName) {
-      staffData.push(staffName.st_name);
+  for(let i=0 ;i<data.length ;i++){
+    let date = data[i]['createdAt']
+    data[i]['uploadedAt'] = moment(date).format("ll"); 
+
+
+    if(data[i]['visibility'] == "Public"){
+      data[i]['videoStatus'] = "Published"
+    }else{
+      data[i]['videoStatus'] = "Uploaded"
     }
   }
-  res.render('Admin/Video/getClass', {
-    data: results,
-    staffData: staffData,
-    page_name: 'classes',
+  
+  res.render('Admin/Video/getVideos', {
+    data,
+    page_name: 'video',
   });
 };
 
@@ -797,22 +799,24 @@ exports.getClass = async (req, res, next) => {
 exports.getVideo = async (req, res, next) => {
 
   const categories = await categoryModel.find({});
+  const visibility = [ "Public" , "Unlisted"]
 
   res.render('Admin/Video/addVideo', {
-    page_name: 'classes',
-    categories
+    page_name: 'videos',
+    categories,
+    visibility
   });
 };
 
 exports.postVideo = async (req, res, next) => {
-  console.log("body", req.body);
-  let { videoName, description, category } = req.body;
+  console.log("body", req.user , req.body);
+  let { videoName, description, category , visibility} = req.body;
   let imageUrl;
   let videoUrl;
 
   const videoData = await videoModel.findOne({
     name: videoName,
-    category,
+    category
   });
 
   if (videoData) {
@@ -832,26 +836,25 @@ exports.postVideo = async (req, res, next) => {
       if (obj.fieldname == 'thumbnailFile') {
         let path = `images/${obj.originalname}`;
         const result = await upload(obj, path);
-        console.log(result);
         imageUrl = result;
       }
     }
 
     let obj = {
+      id: uuidv4(),
       name: videoName,
       category,
       description,
       imageUrl,
       videoUrl,
+      visibility,
+      userId : req.user
     };
+    console.log("obj",obj)
+    let result = await videoModel.create(obj);
 
-    let result = await videoModel.create({
-      id: uuidv4(),
-      ...obj,
-    });
-
-    console.log(result);
-    res.redirect('/admin/profile');
+    console.log(result ,"-=-==-");
+    res.redirect('/admin/getAllVideo');
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
@@ -861,28 +864,24 @@ exports.postVideo = async (req, res, next) => {
 
 
 // 4.3 Modify existing classes
-exports.getClassSettings = async (req, res, next) => {
-  const classId = req.params.id;
+exports.getEditVideo= async (req, res, next) => {
+  const videoId = req.params.id;
 
-  const classData = await classModel.find({
-    _id: classId
+  const videoData = await videoModel.find({
+    id: videoId
   })
-  console.log(classData)
-  const courseData = await courseModel.find({});
+  console.log("videoData",videoData);
 
-  const staffData = await staffModel.find({});
+  const categories = await categoryModel.find({});
+  const visibility = [ "Public" , "Unlisted"];
 
-  const staffEmail = await staffModel.find({ email: classData[0].st_id })
 
-  let year = ["First Year", "Second Year", "Third Year", "Forth Year"]
 
-  res.render('Admin/Video/setClass', {
-    classData: classData[0]._id,
-    courseData,
-    staffData,
-    staffEmail: staffEmail[0],
-    years: year,
-    page_name: 'classes',
+  res.render('Admin/Video/updateVideo', {
+    categories,
+    visibility,
+    videoData : videoData[0], 
+    page_name: 'videos',
   });
 };
 

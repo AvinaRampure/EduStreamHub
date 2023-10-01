@@ -1,25 +1,37 @@
 const mongoose = require("mongoose")
 
 const videoSchema = new mongoose.Schema({
-
-	id :{ 
+    id : {
         type:String,
         unique:true
     },
 	name :{
-        type:String
+        type:String,
+        unique:false
     },
     description :{
-        type:String
+        type:String,
+        unique:false
     },
     videoUrl:{
-        type:String
+        type:String,
+        unique:false
     },
 	imageUrl :{
-        type:String
+        type:String,
+        unique:false
     },
 	category :{
-        type:String
+        type:String,
+        unique:false
+    },
+    visibility : {
+        type : String,
+        unique:false
+    },
+    userId :{
+        type : String,
+        unique : false
     }
     
 }, { timestamps: true })

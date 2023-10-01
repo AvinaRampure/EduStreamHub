@@ -7,6 +7,9 @@ const categorySchema = new mongoose.Schema({
     },
 	cname :{
         type:String
+    },
+    userId :{
+        type : String
     }
 }, { timestamps: true })
 

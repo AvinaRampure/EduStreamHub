@@ -20,6 +20,12 @@ const documentSchema = new mongoose.Schema({
     },
 	category :{
         type:String
+    },
+    visibility : {
+        type : String
+    },
+    userId :{
+        type : String
     }
 }, { timestamps: true })
 

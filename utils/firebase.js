@@ -1,9 +1,9 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('./firstproject-b9354-firebase-adminsdk-a6zup-71213c5f71.json');
+const serviceAccount = require('./edustream-hub-firebase-adminsdk-rru81-b5c6445df6.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'gs://firstproject-b9354.appspot.com',
+  storageBucket: 'gs://edustream-hub.appspot.com',
 });
 
 const bucket = admin.storage().bucket();

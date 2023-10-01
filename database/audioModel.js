@@ -20,8 +20,13 @@ const audioSchema = new mongoose.Schema({
     },
 	category :{
         type:String
+    },
+    visibility : {
+        type : String
+    },
+    userId :{
+        type : String
     }
-    
 }, { timestamps: true })
 
 module.exports = mongoose.model("audio", audioSchema)

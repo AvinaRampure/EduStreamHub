@@ -1,6 +1,24 @@
-<%- include('../../Includes/begin.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
 
-    <link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS NSIT</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+        integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="../../../CSS/main.css">
+    <link rel="stylesheet" href="../../../CSS/student-dashboard.css">
+    <link rel="stylesheet" href="../../../CSS/student-profile.css">
+
+</head>
+
+<body>    
+<link rel="stylesheet" href="../../CSS/admin-dashboard.css">
 
     <div class="container-fluid">
 
@@ -23,7 +41,7 @@
                                             <div class="card-header bg-white border-0">
                                                 <div class="row align-items-center">
                                                     <div class="col-8">
-                                                        <h3 class="mb-0" style="color: brown;">Upload Video</h3>
+                                                        <h3 class="mb-0" style="color: brown;">Update Video</h3>
                                                     </div>
                                                 </div>
                                             </div>
@@ -31,15 +49,31 @@
                                                 <div class="card-body">
                                                     <form id="formId" action="/admin/addVideo" method="POST"
                                                         enctype="multipart/form-data">
-                                                        <h6 class="heading-small text-muted mb-4">Video information</h6>
                                                         <div class="pl-lg-4">
+                                                            <div class="row">
+                                                                    <div class="col-lg-6">
+                                                                        <h6 class="heading-small text-muted mb-4">Video Preview</h6>
+                                                                        <video id="videoPreview" width="400" controls>
+                                                                            <source src="<%= videoData.videoUrl %>" type="video/mp4">
+                                                                            Your browser does not support the video tag.
+                                                                        </video>
+                                                                    </div>
+                                                      
+                                                                
+                                                                    <div class="col-lg-6">
+                                                                        <h6 class="heading-small text-muted mb-4">Thumbnail Preview</h6>
+                                                                        <img id="imagePreview" src="<%= videoData.imageUrl %>" alt="Thumbnail Preview" style="width: 400px;">
+                                                                    </div>
+                                                                   
+                                                                
+                                                            </div>
                                                             <div class="row">
                                                                 <div class="col-lg-6">
                                                                     <div class="form-group">
                                                                         <label class="form-control-label"
                                                                             for="videoName">Video Name</label>
                                                                         <input type="text" class="form-control"
-                                                                            id="videoName" name="videoName" required>
+                                                                            id="videoName" name="videoName" value="<%= videoData.name %>">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-6">
@@ -48,7 +82,7 @@
                                                                             for="description">Description</label>
                                                                         <input type="text" class="form-control"
                                                                             id="description" name="description"
-                                                                            required>
+                                                                            value="<%= videoData.description %>">
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -57,19 +91,7 @@
                                                                 <div class="col-lg-6">
                                                                     <div class="form-group">
                                                                         <label class="form-control-label"
-                                                                            for="videoFile">Upload Video</label>
-                                                                        <input type="file" class="form-control"
-                                                                            id="videoFile" name="videoFile"
-                                                                            accept="video/*" required>
-                                                                        <!-- Add a div for displaying upload percentage -->
-                                                                        <div id="uploadPercentage"></div>
-                                                                    </div>
-
-                                                                </div>
-                                                                <div class="col-lg-6">
-                                                                    <div class="form-group">
-                                                                        <label class="form-control-label"
-                                                                            for="thumbnailFile">Upload Thumbnail</label>
+                                                                            for="thumbnailFile">Update Thumbnail</label>
                                                                         <input type="file" class="form-control"
                                                                             id="thumbnailFile" name="thumbnailFile"
                                                                             accept="image/*" required>
@@ -117,7 +139,7 @@
                                                         </div>
                                                         <hr class="my-4">
                                                         <button type="submit" class="btn btn-primary btn-block"
-                                                            >UPLOAD
+                                                            >UPDATE
                                                             VIDEO</button>
                                                     </form>
 

@@ -42,6 +42,7 @@ const requireAuth = (req, res, next) => {
             );
             res.redirect('/unauthorized');
           } else {
+            console.log("result",result)
             req.user = result.id;
             next();
           }
