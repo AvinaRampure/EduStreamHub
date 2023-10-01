@@ -1,0 +1,120 @@
+<%- include('../../Includes/begin.ejs') %>
+
+    <link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+
+    <div class="container-fluid">
+
+        <div id="wrapper">
+
+            <%- include('../../Includes/admin_nav.ejs') %>
+
+                <section id="content-wrapper">
+                    <main role="main" class="pt-5 main">
+
+                        <div class="main-content">
+                            <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center"
+                                style="height: 100px; background-size: cover; background-position: center top;">
+
+                            </div>
+                            <div class="container-fluid mt--7">
+                                <div class="row">
+                                    <div class="col-xl-12 order-xl-1">
+                                        <div class="card bg-secondary shadow">
+                                            <div class="card-header bg-white border-0">
+                                                <div class="row align-items-center">
+                                                    <div class="col-8">
+                                                        <h3 class="mb-0" style="color: brown;">Upload Video</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <%- include('../../Includes/messages') %>
+                                                <div class="card-body">
+                                                    <form id="formId" action="/admin/addVideo" method="POST"
+                                                        enctype="multipart/form-data">
+                                                        <h6 class="heading-small text-muted mb-4">Video information</h6>
+                                                        <div class="pl-lg-4">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="videoName">Video Name</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="videoName" name="videoName" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="description">Description</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="description" name="description"
+                                                                            required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="videoFile">Upload Video</label>
+                                                                        <input type="file" class="form-control"
+                                                                            id="videoFile" name="videoFile"
+                                                                            accept="video/*" required>
+                                                                        <!-- Add a div for displaying upload percentage -->
+                                                                        <div id="uploadPercentage"></div>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="thumbnailFile">Upload Thumbnail</label>
+                                                                        <input type="file" class="form-control"
+                                                                            id="thumbnailFile" name="thumbnailFile"
+                                                                            accept="image/*" required>
+                                                                        <div id="thumbnailPercentage"></div>
+                                                                    </div>
+                                                                    <!-- Add an img element for image preview -->
+                                                                    <img id="imagePreview" src=""
+                                                                        alt="Thumbnail Preview"
+                                                                        style="max-width: 100%; display: none;">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="category">Category</label>
+                                                                        <select class="form-control" id="category"
+                                                                            name="category" required>
+                                                                            <% for(const category of categories) { %>
+                                                                                <option>
+                                                                                    <%= category.cname%>
+                                                                                </option>
+                                                                                <% } %>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr class="my-4">
+                                                        <button type="submit" class="btn btn-primary btn-block"
+                                                            >UPLOAD
+                                                            VIDEO</button>
+                                                    </form>
+
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </section>
+        </div>
+    </div>
+
+
+    <%- include('../../Includes/admin_end.ejs') %>

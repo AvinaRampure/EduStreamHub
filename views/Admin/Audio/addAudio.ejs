@@ -1,0 +1,207 @@
+<%- include('../../Includes/begin.ejs') %>
+
+    <link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+
+    <div class="container-fluid">
+
+        <div id="wrapper">
+
+            <%- include('../../Includes/admin_nav.ejs') %>
+
+                <section id="content-wrapper">
+                    <main role="main" class="pt-5 main">
+
+                        <div class="main-content">
+                            <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center"
+                                style="height: 100px; background-size: cover; background-position: center top;">
+
+                            </div>
+                            <div class="container-fluid mt--7">
+                                <div class="row">
+                                    <div class="col-xl-12 order-xl-1">
+                                        <div class="card bg-secondary shadow">
+                                            <div class="card-header bg-white border-0">
+                                                <div class="row align-items-center">
+                                                    <div class="col-8">
+                                                        <h3 class="mb-0" style="color: brown;">Upload Audios</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <%- include('../../Includes/messages') %>
+                                                    <form action="/admin/addAudio" method="POST"
+                                                        enctype="multipart/form-data">
+                                                        <h6 class="heading-small text-muted mb-4">Audio information</h6>
+                                                        <div class="pl-lg-4">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="audioName">Audio Name</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="audioName" name="audioName" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="description">Description</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="description" name="description"
+                                                                            required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="audioFile">Upload Audio</label>
+                                                                        <input type="file" class="form-control"
+                                                                            id="audioFile" name="audioFile"
+                                                                            accept=".mp3,audio/*" required>
+                                                                        <!-- Add a div for displaying upload percentage -->
+                                                                        <div id="uploadPercentage"></div>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="thumbnailFile">Upload Cover Image</label>
+                                                                        <input type="file" class="form-control"
+                                                                            id="thumbnailFile" name="thumbnailFile"
+                                                                            accept="image/*" required>
+                                                                        <div id="thumbnailPercentage"></div>
+                                                                    </div>
+                                                                    <!-- Add an img element for image preview -->
+                                                                    <img id="imagePreview" src=""
+                                                                        alt="Thumbnail Preview"
+                                                                        style="max-width: 100%; display: none;">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="category">Category</label>
+                                                                        <select class="form-control" id="category"
+                                                                            name="category" required>
+                                                                            <% for(const category of categories) { %>
+                                                                                <option>
+                                                                                    <%= category.cname%>
+                                                                                </option>
+                                                                                <% } %>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr class="my-4">
+                                                        <button type="submit" class="btn btn-primary btn-block">UPLOAD
+                                                            AUDIO</button>
+                                                    </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </section>
+        </div>
+    </div>
+
+    <script>
+        const videoFileInput = document.getElementById('videoFile');
+        const uploadPercentageElement = document.getElementById('uploadPercentage');
+        const imageFileInput = document.getElementById('thumbnailFile');
+        const imagePercentageElement = document.getElementById('thumbnailPercentage');
+        let videoUrl
+        let imageUrl
+
+        // Add an event listener to the file input
+        videoFileInput.addEventListener('change', () => {
+            const file = videoFileInput.files[0];
+
+            if (file) {
+                // Create a FormData object to send the file
+                const formData = new FormData();
+                formData.append('videoFile', file);
+
+                // Create a Fetch request to upload the file and track the progress
+
+                uploadPercentageElement.innerText = `Uploading Started`;
+                fetch('/admin/uploadVideo', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            uploadPercentageElement.innerText = `Uploading Failed`;
+                            throw new Error('Upload failed');
+                        } else if (response.status == 200) {
+
+                            uploadPercentageElement.innerText = `Upload Completed`;
+                            videoUrl = response.downloadURL
+                            return response.json();
+                        }
+
+                    })
+                    .then((data) => {
+                        // Handle the response data if needed
+                    })
+                    .catch((error) => {
+                        console.error('Upload error:', error);
+                    });
+            }
+        });
+
+        imageFileInput.addEventListener('change', () => {
+            const file = imageFileInput.files[0];
+
+            if (file) {
+                // Create a FormData object to send the file
+                const formData = new FormData();
+                formData.append('thumbnailFile', file);
+
+                // Create a Fetch request to upload the file and track the progress
+
+                imagePercentageElement.innerText = `Uploading Started`;
+                fetch('/admin/uploadImage', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            imagePercentageElement.innerText = `Uploading Failed`;
+                            throw new Error('Upload failed');
+                        } else if (response.status == 200) {
+
+                            imagePercentageElement.innerText = `Upload Completed`;
+                           return response.json();
+                        }
+
+                    })
+                    .then((data) => {
+                        // Handle the response data if needed
+                        console.log(data,'data')
+                        imageUrl = data.downloadURL
+                        document.getElementById('imagePreview').src = imageUrl;
+                        document.getElementById('imagePreview').style.display = 'block'; // Show the image preview
+                            
+                    })
+                    .catch((error) => {
+                        console.error('Upload error:', error);
+                    });
+            }
+        });
+
+
+    </script>
+
+
+    <%- include('../../Includes/admin_end.ejs') %>

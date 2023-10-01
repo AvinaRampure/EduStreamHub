@@ -1,0 +1,91 @@
+<%- include('../Includes/begin.ejs') %>
+
+  <%- include('../Includes/student_nav.ejs') %>
+
+
+      <section id="content-wrapper">
+      <main role="main" class="pt-5 main ">
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+        style="min-height:300px; background-image: url(https://www.fergusson.edu/upload/homeslideimage/48992_FergussonCollegePune_banner-main.jpg); background-size: cover; background-position: center;">
+        <!-- Mask -->
+        <span class="mask opacity-8" style="  background-color: #5e5f6a7a; background-size: cover;"></span>
+        <!-- Header container -->
+        <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+                <div class="col-lg-7 col-md-10">
+                    <h1 class="display-2 text-white">Hello <%= name %></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+        <hr>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="card" style="box-shadow: 0 1rem 2rem 0 rgba(136, 152, 170, .15) !important;">
+              <div class="card-header bg-danger text-white">
+                <div class="col-xs-3">
+                  <i class="fa fa-regular fa-bell fa-4x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                  <div class="huge"><%= noticeCount %></div>
+                  <div>Notice</div>
+                </div>
+              </div>
+              <a href="/student/notice">
+                <div class="card-footer bg-danger text-white">
+                  <span class="float-left">View Details</span>
+                  <span class="float-right"><i class="fa fa-arrow-circle-right"></i></span>
+                  <div class="clearfix"></div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="card" style="box-shadow: 0 1rem 2rem 0 rgba(136, 152, 170, .15) !important;">
+              <div class="card-header bg-success text-white">
+                <div class="col-xs-3">
+                  <i class="fa fa-calendar-week fa-4x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                  <div class="huge"><%= scheduleCount %></div>
+                  <div>Schedule</div>
+                </div>
+              </div>
+              <a href="/student/schedule">
+                <div class="card-footer bg-success text-white">
+                  <span class="float-left">View Details</span>
+                  <span class="float-right"><i class="fa fa-arrow-circle-right"></i></span>
+                  <div class="clearfix"></div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="card" style="box-shadow: 0 1rem 2rem 0 rgba(136, 152, 170, .15) !important;">
+              <div class="card-header bg-warning text-white">
+                <div class="col-xs-3">
+                  <i class="fa fa-chalkboard-teacher fa-4x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                  <div class="huge"><%= syllabusCount %></div>
+                  <div>Syllabus</div>
+                </div>
+              </div>
+              <a href="/student/syllabus">
+                <div class="card-footer bg-warning text-white">
+                  <span class="float-left">View Details</span>
+                  <span class="float-right"><i class="fa fa-arrow-circle-right"></i></span>
+                  <div class="clearfix"></div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+
+      </main>
+    </section>
+
+    <%- include('../Includes/student_end.ejs') %>

@@ -1,0 +1,86 @@
+<aside id="sidebar-wrapper">
+
+    <ul class="sidebar-nav">
+        <li class="<% if (page_name === 'profile') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="/admin/profile"><i class="fa fa-home"></i>DASHBOARD</a>
+        </li>
+        <li class="<% if (page_name === 'video') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-solid fa-video"></i>Video</a>
+            <div class="dropdown-content">
+                <a href="/admin/addVideo">Upload New Video</a>
+                <a href="/admin/getVideo">Manage Video </a>
+            </div>
+        </li>
+
+
+        <li class="<% if (page_name === 'documents') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-solid fa-book"></i>Documents</a>
+            <div class="dropdown-content">
+                <a href="/admin/addDoc">Upload Documents</a>
+                <a href="/admin/getDocument">Manage Documents </a>
+            </div>
+        </li>
+
+        <li class="<% if (page_name === 'audios') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-sharp fa-regular fa-headphones"></i>Audio</a>
+            <div class="dropdown-content">
+                <a href="/admin/addAudio">Upload Audio</a>
+                <a href="/admin/getAudio">Manage Audio's</a>
+            </div>
+        </li>
+
+        <li class="<% if (page_name === 'category') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-solid fa-plus"></i>Category</a>
+            <div class="dropdown-content">
+                <a href="/admin/addCategory">Add New Category</a>
+                <a href="/admin/getCategory">Manage Category </a>
+            </div>
+        </li>
+        
+        <hr>
+        <li class="<% if (page_name === 'settings') { %>
+            dropup active
+            <%} else { %>
+                dropup
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-cog"></i>Settings</a>
+            <div class="dropup-content">
+                <a href="/admin/info_settings">Update Profile</a>
+                <a href="/admin/password_settings">Change Password</a>
+            </div>
+        </li>
+        <li>
+            <a href="/admin/logout"><i class="fa fa-sign-out-alt"></i>Logout</a>
+        </li>
+    </ul>
+</aside>
+
+<div id="navbar-wrapper" style="position: fixed;">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="#" class="navbar-brand" id="sidebar-toggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+    </nav>
+</div>

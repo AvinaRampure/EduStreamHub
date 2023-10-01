@@ -1,0 +1,71 @@
+<div class="container-fluid">
+
+    <div id="wrapper">
+
+        <aside id="sidebar-wrapper">
+
+            <ul class="sidebar-nav">
+                <li class="<% if (page_name === 'overview') { %>
+                     active
+                    <%} %>">
+                    <a class="ddbtn" href="/staff/dashboard"><i class="fa fa-home"></i>Dashboard</a>
+                </li>
+                <li class="<% if (page_name === 'profile') { %>
+                     active
+                    <%} %>">
+                    <a class="ddbtn" href="/staff/profile"><i class="fa fa-id-card"></i>Profile</a>
+                </li>
+
+                <li class="<% if (page_name === 'notice') { %>
+                    dropdown active
+                    <%} else { %>
+                    dropdown
+                    <% } %>">
+                   <a class="ddbtn" href="/staff/getAllNotice"><i class="fa fa-regular fa-bell"></i>Notice</a>
+                   <div class="dropdown-content">
+                    <a href="/staff/addnotice">Add Notice</a>
+                    <a href="/staff/getAllNotice">Manage Notice </a>
+                </div>
+               </li>
+
+
+                    <li class="<% if (page_name === 'syllabus') { %>
+                        dropdown active
+                        <%} else { %>
+                        dropdown
+                        <% } %>">
+                    <a class="ddbtn" href="/staff/getAllSyllabus"><i class="fa fa-chalkboard-teacher"></i>Syllabus</a>
+                    <div class="dropdown-content">
+                        <a href="/staff/addSyllabus">Add Syllabus</a>
+                        <a href="/staff/getAllSyllabus">Manage Syllabus </a>
+                    </div>
+                </li>
+
+                <li class="<% if (page_name === 'schedule') { %>
+                    dropdown active
+                    <%} else { %>
+                    dropdown
+                    <% } %>">
+                   <a class="ddbtn" href="/staff/getAllSchedule"><i class="fa fa-sharp fa-regular fa-calendar-week"></i>Daily Schedule</a>
+                   <div class="dropdown-content">
+                    <a href="/staff/addSchedule">Add Schedule</a>
+                    <a href="/staff/getAllSchedule">Manage Schedule </a>
+                </div>
+               </li>
+
+                <hr>
+                <li>
+                    <a href="/staff/logout"><i class="fa fa-sign-out-alt"></i>Logout</a>
+                </li>
+            </ul>
+        </aside>
+
+        <div id="navbar-wrapper" style="position: fixed;">
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a href="#" class="navbar-brand" id="sidebar-toggle"><i class="fa fa-bars"></i></a>
+                    </div>
+                </div>
+            </nav>
+        </div>

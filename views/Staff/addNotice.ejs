@@ -1,0 +1,74 @@
+<%- include('../Includes/begin.ejs') %>
+    <%- include('../Includes/staff_nav.ejs') %>
+
+        <section id="content-wrapper">
+            <main role="main" class="pt-5 main">
+
+                <div class="main-content">
+                    <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center"
+                        style="height: 100px; background-size: cover; background-position: center top;">
+
+                    </div>
+                    <div class="container-fluid mt--7">
+                        <div class="row">
+                            <div class="col-xl-12 order-xl-1">
+                                <div class="card bg-secondary shadow">
+                                    <div class="card-header bg-white border-0">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <h3 class="mb-0" style="color: brown;">Create Notice</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <%- include('../Includes/messages') %>
+                                            <form action="/staff/addnotice" method="POST" enctype="multipart/form-data">
+                                                <div class="pl-lg-4">
+                                                    <h4 class="fw-bold fs-1 mt-4">Notice Name</h4>
+                                                    <input type="text" class="form-control" id="name" name="name">
+
+                                                   
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <h4 class="fw-bold fs-1 mt-4">Select Departmet</h4>
+                                                                <select class="form-control" id="department" name="department"
+                                                                    required>
+                                                                    <% for(const dept of departments) { %>
+                                                                        <option>
+                                                                            <%= dept.dept_id %>-<%= dept.d_name %>
+                                                                        </option>
+                                                                        <% } %>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                 <h4 class="fw-bold fs-1 mt-4">Upload Notice</h4>
+                                                                <input type="file" class="form-control-file" id="exampleFormControlFile1" name="file">
+                                                              </div>
+                                                        </div>
+                                                        
+
+                                                    </div>
+                                                </div>
+                                                <hr class="my-4">
+                                                <button type="submit" class="btn btn-primary btn-block">Add
+                                                    Notice</button>
+                                            </form>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </main>
+        </section>
+
+        <%- include('../Includes/staff_end.ejs') %>

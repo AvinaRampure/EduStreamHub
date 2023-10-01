@@ -1,0 +1,36 @@
+<%- include('../Includes/begin.ejs') %>
+    <%- include('../Includes/staff_nav.ejs') %>
+
+        <section id="content-wrapper">
+            <main role="main" class="pt-5 main">
+                <div class="header pb-4 pb-sm-8 pt-5 pt-lg-4 d-flex align-items-center"
+                    style="max-height: 100px; background-size: cover; background-position: center top;">
+                    <h1>Hello <%= user.st_name %>
+                    </h1>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                      <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title">Create Syllabus</h5>
+                          <a href="/staff/addSyllabus" class="btn btn-primary">Add</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card">
+                          <div class="card-body">
+                            <h5 class="card-title">View Syllabus</h5>
+                            <a href="/staff/getAllSyllabus" class="btn btn-primary">See </a>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+
+            </main>
+        </section>
+
+        <%- include('../Includes/staff_end.ejs') %>

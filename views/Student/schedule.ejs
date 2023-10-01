@@ -1,0 +1,74 @@
+<%- include('../Includes/begin.ejs') %>
+    <%- include('../Includes/student_nav.ejs') %>
+
+        <section id="content-wrapper">
+            <main role="main" class="mt-5 pl-5 pr-5 main">
+                <div class="header pb-4 pb-sm-8 pt-5 pt-lg-4 d-flex align-items-center"
+                    style="max-height: 100px; background-size: cover; background-position: center top;">
+                    <h1>All Schedule</h1>
+                    </h1>
+                </div>
+                <% if(scheduleData.length != 0) { %>
+                    <div class="row ">
+                        <div class="form-group">
+                            <label class="form-control-label " for="staff">Filter</label>
+                            <select class="form-control" id="filter" name="filter" onchange="myFunction()">
+                                <option>None</option>
+                                <option>Newest</option>
+                                <option>Oldest</option>
+                            </select>
+                        </div>
+                    </div>
+                <div class="row">
+                    <% for(let i=0 ;i< scheduleData.length ;i++) { %>
+                      <div class="col-sm-3">
+                        <div class="card mb-5" style="box-shadow: 0 1rem 2rem 0 rgba(136, 152, 170, .15) !important;">
+                            <% if(exType[i] == 'png' || exType[i] == 'jpg'){ %>
+                                <img class="card-img-top"
+                                height="300"
+                                src="../<%= scheduleData[i].path %>"
+                                alt="image">
+                            <% }else{ %>
+                                <img class="card-img-top"
+                                height="300"
+                               
+                                src="../images/file_logo.png"
+                                alt="image">
+                           <% } %>
+                            
+                            
+                            <div class="card-body">
+                                <h5 class="card-title text-uppercase text-center" ><%= scheduleData[i].name %></h5>
+                                <p class="card-title text-uppercase text-center"> <%= scheduleData[i].date %></p>
+                            </div>
+                            <div class="card-footer">
+                                <div class="btn-wrapper text-center d-flex justify-content-center"
+                                    style="color: #fff; ">
+                                    <a href="../<%= scheduleData[i].path %>" class="btn btn-primary" target="_blank">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                      <% } %>
+                      <% }else { %>
+                        <div class="col-sm-6">
+                            <div class="alert alert-primary" role="alert">
+                                * No Schedule Available Right Now !
+                              </div>
+                          </div>
+                    <% } %>
+                </div>
+                
+
+            </main>
+        </section>
+
+        <script>
+            function myFunction(){
+
+                let value = document.getElementById("filter").value
+                console.log(value)
+                location.replace(`/student/schedule?sort=${value}`)
+            }
+        </script>
+        <%- include('../Includes/student_end.ejs') %>
