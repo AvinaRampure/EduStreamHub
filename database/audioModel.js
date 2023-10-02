@@ -1,7 +1,6 @@
 const mongoose = require("mongoose")
 
 const audioSchema = new mongoose.Schema({
-
 	id :{ 
         type:String,
         unique:true

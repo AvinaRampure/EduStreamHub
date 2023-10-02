@@ -78,23 +78,23 @@ router.get('/addVideo', requireAuth, controller.getVideo);
 router.post('/addVideo',requireAuth ,upload.any(), controller.postVideo);
 // 4.3 Modify existing classes
 router.get('/edit/video/:id', requireAuth, controller.getEditVideo);
-router.post('/settings/class', requireAuth, controller.postClassSettings);
-router.get('/settings/deleteClass/:id', requireAuth, controller.deleteClass);
+router.post('/edit/video/:id', requireAuth,upload.any() , controller.postEditVideo);
+router.get('/edit/deleteVideo/:id', requireAuth, controller.deleteVideo);
 
 // 5.DEPARTMENTS
 // 5.1 Select department
-router.get('/getDept', requireAuth, controller.getDept);
+router.get('/getAllDoc', requireAuth, controller.getAllDoc);
 // 5.2 Add department
 router.get('/addDoc', requireAuth, controller.getAddDoc);
 router.post('/addDoc', requireAuth,upload.any() , controller.postAddDoc);
 // 5.3 Modify existing department
-router.get('/settings/Document/:id', requireAuth, controller.getDeptSettings);
-router.post('/settings/department', requireAuth, controller.postDeptSettings);
-router.get('/settings/deleteDept/:id', requireAuth, controller.deleteDept);
+router.get('/edit/file/:id', requireAuth, controller.getEditFile);
+router.post('/edit/file/:id', requireAuth, upload.any() ,controller.postEditFile);
+router.get('/edit/deleteFile/:id', requireAuth, controller.deleteFile);
 
 // 6.COURSES
 // 6.1 Get all courses
-router.get('/getAllCourses', requireAuth, controller.getAllCourse);
+router.get('/getAllAudios', requireAuth, controller.getAllAudios);
 // 6.2 Get courses on query
 router.get('/getCourse', requireAuth, controller.getRelevantCourse);
 router.post('/getCourse', requireAuth, controller.postRelevantCourse);
@@ -102,9 +102,9 @@ router.post('/getCourse', requireAuth, controller.postRelevantCourse);
 router.get('/addAudio', requireAuth, controller.getAddAudio);
 router.post('/addAudio', requireAuth,upload.any(), controller.postAddAudio);
 // 6.4 Modify existing courses
-router.get('/settings/Audio/:id', requireAuth, controller.getCourseSettings);
-router.post('/settings/course', requireAuth, controller.postCourseSettings);
-router.get('/settings/deleteCourse/:id', requireAuth, controller.deleteCourse);
+router.get('/edit/audio/:id', requireAuth, controller.getEditAudio);
+router.post('/edit/audio/:id', requireAuth,upload.any() , controller.postEditAudio);
+router.get('/edit/deleteAudio/:id', requireAuth, controller.deleteAudio);
 
 // Qr Code
 router.get('/addExamTT',requireAuth, controller.getGenerateQr);

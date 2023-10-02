@@ -840,26 +840,27 @@ exports.postVideo = async (req, res, next) => {
       }
     }
 
-    let obj = {
-      id: uuidv4(),
-      name: videoName,
-      category,
-      description,
-      imageUrl,
-      videoUrl,
-      visibility,
-      userId : req.user
-    };
-    console.log("obj",obj)
-    let result = await videoModel.create(obj);
-
-    console.log(result ,"-=-==-");
-    res.redirect('/admin/getAllVideo');
+ 
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect('/admin/addVideo'); // Redirect to a relevant page in case of an error
+    res.redirect('/admin/addVideo'); 
   }
+
+  let obj = {
+    id: uuidv4(),
+    name: videoName,
+    category,
+    description,
+    imageUrl,
+    videoUrl,
+    visibility,
+    userId : req.user
+  };
+  console.log("obj",obj)
+  let result = await videoModel.create(obj);
+
+  res.redirect('/admin/getAllVideo');
 };
 
 
@@ -885,45 +886,101 @@ exports.getEditVideo= async (req, res, next) => {
   });
 };
 
-exports.postClassSettings = async (req, res, next) => {
-  const { staff, course, year, classId } = req.body;
+exports.postEditVideo = async (req, res, next) => {
+  console.log("body", req.user , req.body);
+  let videoId = req.params.id;
+  let { videoName, description, category , visibility} = req.body;
+  let imageUrl;
 
-  console.log(classId);
+  let checkVideo =   await videoModel.findOne({ id : videoId , userId :req.user });
 
-  await classModel.updateOne({ _id: classId }, {
-    c_id: course,
-    year: year
-  })
-  req.flash('success_msg', 'Class changed successfully!');
-  res.redirect('/admin/getClass');
+  if(!checkVideo){
+    req.flash('error', 'You Can"t Update other admin video');
+    res.redirect(`/admin/edit/video/${videoId}`);
+  }
+
+  try {
+    for (let obj of req.files) {
+
+      if (obj.fieldname == 'thumbnailFile') {
+        let path = `images/${obj.originalname}`;
+        const result = await upload(obj, path);
+        imageUrl = result;
+      }
+    }
+
+  } catch (error) {
+    console.error('Error during file upload:', error);
+    req.flash('error', 'File upload failed');
+    res.redirect(`/admin/edit/video/${videoId}`); 
+  }
+
+  let obj = {
+    name: videoName,
+    category,
+    description,
+    visibility
+  };
+
+  if(imageUrl){
+    obj['imageUrl'] = imageUrl
+  }
+  
+  console.log("obj",obj);
+
+  let udpadteVideo = await videoModel.updateOne({ id: videoId }, obj);
+
+  req.flash('success_msg', 'Video updated successfully!');
+  res.redirect('/admin/getAllVideo');
 };
 
-exports.deleteClass = async (req, res, next) => {
-  const _id = req.params.id;
+exports.deleteVideo = async (req, res, next) => {
+  const id = req.params.id;
 
-  await classModel.deleteOne({ _id });
-  res.redirect('/admin/getClass');
+  let checkVideo = await videoModel.find({userId:req.user,id});
+  if(checkVideo.length == 0){
+    req.flash('error', 'You Can"t Delete Video Of Other Admins');
+    res.redirect('/admin/getAllVideo');
+    return
+  }
+
+  await videoModel.deleteOne({ id });
+  res.redirect('/admin/getAllVideo');
 }
 
 // 5. DEPARTMENTS
 // 5.1 Select department
-exports.getDept = async (req, res, next) => {
-  const results = await departmentModel.find()
-  res.render('Admin/Document/getDept', {
-    data: results,
-    page_name: 'depts',
+exports.getAllDoc = async (req, res, next) => {
+  let data = await documentModel.find({});
+
+  for(let i=0 ;i<data.length ;i++){
+    let date = data[i]['createdAt']
+    data[i]['uploadedAt'] = moment(date).format("ll"); 
+
+
+    if(data[i]['visibility'] == "Public"){
+      data[i]['docStatus'] = "Published"
+    }else{
+      data[i]['docStatus'] = "Uploaded"
+    }
+  }
+  
+  res.render('Admin/Document/getAllDoc', {
+    data,
+    page_name: 'documents',
   });
 };
 
 // 5.2 Add department
 exports.getAddDoc = async (req, res, next) => {
   const categories = await categoryModel.find({});
-  res.render('Admin/Document/addDoc', { page_name: 'documents', categories });
+  const visibility = [ "Public" , "Unlisted"]
+  res.render('Admin/Document/addDoc', { page_name: 'documents', categories,visibility });
 };
 
 exports.postAddDoc = async (req, res, next) => {
   console.log("body", req.body , req.user);
-  let { fName, description, category } = req.body;
+  let { fName, description, category ,visibility} = req.body;
   let imageUrl;
   let docUrl;
 
@@ -953,68 +1010,137 @@ exports.postAddDoc = async (req, res, next) => {
       }
     }
 
-    let obj = {
-      name: fName,
-      category,
-      description,
-      imageUrl,
-      docUrl,
-    };
-
-    let result = await documentModel.create({
-      id: uuidv4(),
-      ...obj,
-    });
-
-    console.log(result);
-    res.redirect('/admin/profile');
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
     res.redirect('/admin/addVideo'); 
   }
+
+  let obj = {
+    id: uuidv4(),
+    name: fName,
+    category,
+    description,
+    imageUrl,
+    docUrl,
+    visibility,
+    userId : req.user
+  };
+
+  let result = await documentModel.create(obj);
+
+  console.log(result);
+  res.redirect('/admin/getAllDoc');
 };
 
 // 5.3 Modify existing department
-exports.getDeptSettings = async (req, res, next) => {
-  const deptId = req.params.id;
+exports.getEditFile = async (req, res, next) => {
+  const docId = req.params.id;
 
-  const results = await departmentModel.findOne({ dept_id: deptId });
-  res.render('Admin/Document/setDept', {
-    name: results.d_name,
-    id: results.dept_id,
-    page_name: 'depts',
-  });
-};
-
-exports.postDeptSettings = async (req, res, next) => {
-  const { department, deptId } = req.body;
-
-  await queryParamPromise(sql, [department, deptId]);
-  await departmentModel.updateOne({ dept_id: deptId }, {
-    d_name: department
+  const docData = await documentModel.find({
+    id: docId
   })
-  req.flash('success_msg', 'Department changed successfully!');
-  res.redirect('/admin/getDept');
+  console.log("docData",docData);
+
+  const categories = await categoryModel.find({});
+  const visibility = [ "Public" , "Unlisted"];
+
+
+
+  res.render('Admin/Document/updateDoc', {
+    categories,
+    visibility,
+    docData : docData[0], 
+    page_name: 'documents',
+  });
 };
 
-exports.deleteDept = async (req, res, next) => {
-  const dept_id = req.params.id;
+exports.postEditFile = async (req, res, next) => {
+  console.log("body", req.user , req.body);
+  let docId = req.params.id;
+  let { docName, description, category , visibility} = req.body;
+  let imageUrl;
 
-  await departmentModel.deleteOne({
-    dept_id
-  });
-  res.redirect('/admin/getDept');
+  let checkDoc =   await documentModel.findOne({ id : docId , userId :req.user });
+
+  if(!checkDoc){
+    req.flash('error', 'You Can"t Update other admin pdf');
+    res.redirect(`/admin/edit/file/${docId}`);
+  }
+
+  try {
+    for (let obj of req.files) {
+
+      if (obj.fieldname == 'thumbnailFile') {
+        let path = `images/${obj.originalname}`;
+        const result = await upload(obj, path);
+        imageUrl = result;
+      }
+    }
+
+  } catch (error) {
+    console.error('Error during file upload:', error);
+    req.flash('error', 'File upload failed');
+    res.redirect(`/admin/edit/file/${docId}`); 
+  }
+
+  let obj = {
+    name: docName,
+    category,
+    description,
+    visibility
+  };
+
+  if(imageUrl){
+    obj['imageUrl'] = imageUrl
+  }
+  
+  console.log("obj",obj);
+
+  let udpadteDoc = await documentModel.updateOne({ id: docId }, obj);
+
+  req.flash('success_msg', 'Document updated successfully!');
+  res.redirect('/admin/getAllDoc');
+
+};
+
+exports.deleteFile = async (req, res, next) => {
+  const id = req.params.id;
+
+  let checkFile = await documentModel.find({userId:req.user,id});
+  if(checkFile.length == 0){
+    req.flash('error', 'You Can"t Delete File Of Other Admins');
+    res.redirect('/admin/getAllDoc');
+    return
+  }
+
+  await documentModel.deleteOne({ id });
+  res.redirect('/admin/getAllDoc');
 }
 
 // 6. COURSE
 // 6.1 Get all courses
-exports.getAllCourse = async (req, res, next) => {
-  const results = await courseModel.find({})
-  res.render('Admin/Audio/getCourse', {
-    data: results,
-    page_name: 'courses',
+exports.getAllAudios = async (req, res, next) => {
+
+  let data = await audioModel.find({});
+
+  for(let i=0 ;i<data.length ;i++){
+    let date = data[i]['createdAt']
+    data[i]['uploadedAt'] = moment(date).format("ll"); 
+
+
+    if(data[i]['visibility'] == "Public"){
+      data[i]['audioStatus'] = "Published"
+    }else{
+      data[i]['audioStatus'] = "Uploaded"
+    }
+  }
+  
+  res.render('Admin/Audio/getAudio', {
+    data,
+    page_name: 'audios',
   });
+  
 };
 
 // 6.2 Get courses on query
@@ -1067,15 +1193,17 @@ exports.postRelevantCourse = async (req, res, next) => {
 // 6.3 Add course
 exports.getAddAudio = async (req, res, next) => {
   const categories = await categoryModel.find({});
-
+  const visibility = [ "Public" , "Unlisted"]
   res.render('Admin/Audio/addAudio', {
     categories,
+    visibility,
     page_name: 'audios',
   });
 };
+
 exports.postAddAudio = async (req, res, next) => {
-  console.log("body", req.body);
-  let { audioName, description, category } = req.body;
+
+  let { audioName, description, category ,visibility} = req.body;
   let imageUrl;
   let audioUrl;
 
@@ -1106,62 +1234,114 @@ exports.postAddAudio = async (req, res, next) => {
       }
     }
 
-    let obj = {
-      name: audioName,
-      category,
-      description,
-      imageUrl,
-      audioUrl,
-    };
-
-    let result = await audioModel.create({
-      id: uuidv4(),
-      ...obj,
-    });
-
-    console.log(result);
-    res.redirect('/admin/profile');
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
     res.redirect('/admin/addVideo'); 
   }
+
+  
+  let obj = {
+    id: uuidv4(),
+    name: audioName,
+    category,
+    description,
+    imageUrl,
+    audioUrl,
+    visibility,
+    userId : req.user
+  };
+
+  console.log("obj",obj);
+
+  let result = await audioModel.create(obj);
+
+  res.redirect('/admin/profile');
 };
 
-exports.deleteCourse = async (req, res, next) => {
-  const course_id = req.params.id;
+exports.deleteAudio = async (req, res, next) => {
 
-  await courseModel.deleteOne({
-    c_id: course_id
-  });
-  res.redirect('/admin/getCourse');
+  const id = req.params.id;
+
+  let checkAudio = await audioModel.find({userId:req.user,id});
+  if(checkAudio.length == 0){
+    req.flash('error', 'You Can"t Delete Audio Of Other Admins');
+    res.redirect('/admin/getAllAudios');
+    return
+  }
+
+  await audioModel.deleteOne({ id });
+  res.redirect('/admin/getAllAudio');
 
 }
 // 6.4 Modify existing courses
-exports.getCourseSettings = async (req, res, next) => {
-  const cId = req.params.id;
+exports.getEditAudio = async (req, res, next) => {
+  const audioId = req.params.id;
 
-  const courseData = await courseModel.find({ c_id: cId });
-  const deptData = await departmentModel.find({});
-  res.render('Admin/Audio/setCourse', {
-    courseData,
-    page_name: 'courses',
-    departments: deptData,
+  const audioData = await audioModel.find({
+    id: audioId
+  })
+  console.log("audioData",audioData);
+
+  const categories = await categoryModel.find({});
+  const visibility = [ "Public" , "Unlisted"];
+
+
+
+  res.render('Admin/Audio/updateAudio', {
+    categories,
+    visibility,
+    audioData : audioData[0], 
+    page_name: 'audios',
   });
 };
 
-exports.postCourseSettings = async (req, res, next) => {
-  let { course, semester, department, credits, c_type, courseId } = req.body;
+exports.postEditAudio = async (req, res, next) => {
+  console.log("body", req.user , req.body);
+  let audioId = req.params.id;
+  let { audioName, description, category , visibility} = req.body;
+  let imageUrl;
 
-  await courseModel.updateOne({ c_id: courseId }, {
-    name: course,
-    semester: semester,
-    credits: credits,
-    c_type: c_type,
-    dept_id: department,
-  })
-  req.flash('success_msg', 'Course changed successfully!');
-  res.redirect('/admin/getAllCourses');
+  let checkVideo =   await audioModel.findOne({ id : audioId , userId :req.user });
+
+  if(!checkVideo){
+    req.flash('error', 'You Can"t Update other admin Audio');
+    res.redirect(`/admin/edit/audio/${audioId}`);
+  }
+
+  try {
+    for (let obj of req.files) {
+
+      if (obj.fieldname == 'thumbnailFile') {
+        let path = `images/${obj.originalname}`;
+        const result = await upload(obj, path);
+        imageUrl = result;
+      }
+    }
+
+  } catch (error) {
+    console.error('Error during file upload:', error);
+    req.flash('error', 'File upload failed');
+    res.redirect(`/admin/edit/audio/${audioId}`); 
+  }
+
+  let obj = {
+    name: audioName,
+    category,
+    description,
+    visibility
+  };
+
+  if(imageUrl){
+    obj['imageUrl'] = imageUrl
+  }
+  
+  console.log("obj",obj);
+
+  let udpadteAudio = await audioModel.updateOne({ id: audioId }, obj);
+
+  req.flash('success_msg', 'Audio updated successfully!');
+  res.redirect('/admin/getAllAudios');
 };
 
 

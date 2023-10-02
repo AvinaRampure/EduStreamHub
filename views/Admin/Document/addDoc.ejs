@@ -96,6 +96,20 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-lg-6">
+                                                                    <div class="form-group">
+                                                                        <label class="form-control-label"
+                                                                            for="visibility">Visibility</label>
+                                                                        <select class="form-control" id="visibility"
+                                                                            name="visibility" required>
+                                                                            <% for(const name of visibility) { %>
+                                                                                <option>
+                                                                                    <%= name%>
+                                                                                </option>
+                                                                                <% } %>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <hr class="my-4">
