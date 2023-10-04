@@ -1,0 +1,25 @@
+<aside id="sidebar-wrapper">
+
+    <ul class="sidebar-nav">
+        <li class="<% if (page_name === 'dashboard') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="/user/profile"><i class="fa fa-home"></i>DASHBOARD</a>
+        </li>
+        <li>
+            <a href="/user/logout"><i class="fa fa-sign-out-alt"></i>Logout</a>
+        </li>
+    </ul>
+</aside>
+
+<div id="navbar-wrapper" style="position: fixed;">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="#" class="navbar-brand" id="sidebar-toggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+    </nav>
+</div>

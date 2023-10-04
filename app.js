@@ -42,9 +42,8 @@ app.use((req, res, next) => {
 });
 
 const adminRoutes = require('./routes/admin');
-const staffRoutes = require('./routes/staff');
-const studentRoutes = require('./routes/student');
 const homeRoutes = require('./routes/home');
+const userRoutes = require('./routes/user')
 
 
 app.use(express.static(__dirname + '/public'));
@@ -52,10 +51,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({limit: '1mb'}));
 app.use(cookieParser());
 
-
+app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
-app.use('/staff', staffRoutes);
-app.use('/student', studentRoutes);
 app.use('/', homeRoutes);
 
 // Home Page
