@@ -8,7 +8,10 @@ const mailgun = require('mailgun-js');
 const DOMAIN = process.env.DOMAIN_NAME;
 const mg = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: DOMAIN });
 const adminModel = require('../database/adminModel');
-const userModel = require('../database/userModel')
+const userModel = require('../database/userModel');
+const videoModel = require('../database/videoModel');
+const audioModel = require('../database/audioModel');
+const documentModel = require('../database/documentModel')
 
 
 exports.getLogin = (req, res, next) => {
@@ -107,13 +110,48 @@ exports.postRegister = async (req, res, next) => {
 
 exports.getProfile = async (req, res, next) => {
 
+    let video = await videoModel.find({}).limit(10).
+        sort({ createdAt: 1 });
+
+    for (let i = 0; i < video.length; i++) {
+
+        let author = await adminModel.findOne({ admin_id: video[i].userId });
+        console.log("author", author)
+        video[i]['author'] = author.username
+    }
+
+    let audio = await audioModel.find({visibility : "Public"}).limit(10).
+        sort({ createdAt: -1 });
+
+    for (let i = 0; i < audio.length; i++) {
+
+        let author = await adminModel.findOne({ admin_id: audio[i].userId });
+        console.log("author", author)
+        audio[i]['author'] = author.username
+    }
+
+    let doc = await documentModel.find({visibility : "Public"}).limit(10).
+        sort({ createdAt: -1 });
+
+    for (let i = 0; i < doc.length; i++) {
+
+        let author = await adminModel.findOne({ admin_id: doc[i].userId });
+        console.log("author", author)
+        doc[i]['author'] = author.username
+    }
+
+    console.log("doc", doc)
     res.render('User/profile', {
-      page_name: 'Dashboard',
+        videos: video,
+        audios: audio,
+        documents: doc,
+        page_name: 'Dashboard',
     });
-  };
-  
-  exports.getLogout = (req, res, next) => {
+};
+
+exports.getLogout = (req, res, next) => {
+    console.log("logout")
     res.cookie('jwt', '', { maxAge: 1 });
     req.flash('success_msg', 'You are logged out');
     res.redirect('/');
-  };
+};

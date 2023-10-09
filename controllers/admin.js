@@ -1121,8 +1121,8 @@ exports.deleteFile = async (req, res, next) => {
 // 6. COURSE
 // 6.1 Get all courses
 exports.getAllAudios = async (req, res, next) => {
-
-  let data = await audioModel.find({});
+  console.log("user",req.user)
+  let data = await audioModel.find({userId : req.user});
 
   for(let i=0 ;i<data.length ;i++){
     let date = data[i]['createdAt']
