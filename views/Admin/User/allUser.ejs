@@ -1,0 +1,88 @@
+<%- include('../../Includes/begin.ejs') %>
+
+<link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+
+<div class="container-fluid">
+    <div id="wrapper">
+        <%- include('../../Includes/admin_nav.ejs') %>
+        <section id="content-wrapper">
+            <main role="main" class="pt-5 main">
+                <div class="main-content">
+                    <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center"
+                        style="height: 100px; background-size: cover; background-position: center top;">
+                    </div>
+                    <div class="container-fluid mt--7">
+                        <div class="row">
+                            <div class="col-xl-12 order-xl-1">
+                                <div class="card bg-secondary shadow">
+                                    <div class="card-body">
+                                        <%- include('../../Includes/messages') %>
+                                        <input class="form-control mb-4" id="searchInput" type="text"
+                                            placeholder="Search User">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Username</th>
+                                                        <th scope="col">Mobile No</th>
+                                                        <th scope="col">Email</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="userTable">
+                                                    <% for(let i=0; i < data.length; i++) { %>
+                                                        <tr>
+                                                            <th scope="row">
+                                                                <%= i+1 %>
+                                                            </th>
+                                                            <td>
+                                                                <%= data[i].username %>
+                                                            </td>
+                                                            <td>
+                                                                <%= data[i].mobile %>
+                                                            </td>
+                                                            <td>
+                                                                <%= data[i].email %>
+                                                            </td>
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </div>
+</div>
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var searchInput = document.getElementById("searchInput");
+        var userTable = document.getElementById("userTable");
+
+        searchInput.addEventListener("keyup", function () {
+            var searchText = searchInput.value.toLowerCase();
+
+            // Loop through table rows
+            var rows = userTable.getElementsByTagName("tr");
+            for (var i = 0; i < rows.length; i++) { // Start from 1 to skip the table header row
+                var titleCell = rows[i].getElementsByTagName("td")[0]; // Get the third cell (title)
+                var title = titleCell.textContent.toLowerCase();
+                if (title.includes(searchText)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        });
+    });
+</script>

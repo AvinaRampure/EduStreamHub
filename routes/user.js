@@ -20,4 +20,7 @@ router.get('/logout', requireAuth, controller.getLogout);
 
 router.get('/dashboard', requireAuth, controller.getProfile);
 
+router.get('/watch',requireAuth,controller.getVideo)
+router.get('/listen',requireAuth,controller.getAudio)
+
 module.exports = router;

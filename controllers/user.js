@@ -155,3 +155,56 @@ exports.getLogout = (req, res, next) => {
     req.flash('success_msg', 'You are logged out');
     res.redirect('/');
 };
+
+// 2 Get Video
+
+exports.getVideo =async (req, res, next) => {
+    
+    let id = req.query.id ;
+    console.log("here",id)
+    let video = await videoModel.findOne({id,visibility: "Public"});
+
+    let author = await adminModel.findOne({admin_id : video.userId});
+    
+    if(author){
+        video['author'] =  author.username
+    }
+
+
+    let recommendedVideos = await videoModel.find({category : video.category , visibility: "Public"});
+
+    if(recommendedVideos.length){
+        for(let i=0 ;i < recommendedVideos.length ;i++){
+
+        }
+    }
+
+    res.render('User/Video/video', {
+        video,
+        recommendedVideos,
+        page_name: 'Dashboard',
+    });
+}
+
+exports.getAudio =async (req, res, next) => {
+    
+    let id = req.query.id ;
+    console.log("here",id)
+    let audio = await audioModel.findOne({id,visibility: "Public"});
+
+    let author = await audioModel.findOne({admin_id : audio.userId});
+    
+    if(author){
+        audio['author'] =  author.username
+    }
+
+
+    let recommendedAudio = await audioModel.find({category : audio.category , visibility: "Public"});
+
+
+    res.render('User/Audio/audio', {
+        audio,
+        recommendedAudio,
+        page_name: 'Dashboard',
+    });
+}

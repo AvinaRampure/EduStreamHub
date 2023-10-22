@@ -17,7 +17,8 @@ const timeTableModel = 0
 const videoModel = require('../database/videoModel')
 const categoryModel = require('../database/categoryModel')
 const documentModel = require('../database/documentModel')
-const audioModel = require('../database/audioModel')
+const audioModel = require('../database/audioModel');
+const userModel = require('../database/userModel')
 const QRCode = 0
 const { promisify } = require('util');
 
@@ -159,11 +160,13 @@ exports.getProfile = async (req, res, next) => {
   const videos = await videoModel.find({});
   const documents = await documentModel.find({});
   const audios = await audioModel.find({});
+  const users = await userModel.find({});
 
   res.render('Admin/profile', {
     videos : videos.length,
     documents : documents.length ,
     audios : audios.length,
+    users :  users.length,
     user,
     page_name: 'profile',
   });
@@ -1143,6 +1146,7 @@ exports.getAllAudios = async (req, res, next) => {
   
 };
 
+
 // 6.2 Get courses on query
 exports.getRelevantCourse = async (req, res, next) => {
   const results = await departmentModel.find({});
@@ -1506,3 +1510,15 @@ async function upload(fileData, path) {
     throw error; // Rethrow the error to be caught in the calling function
   }
 }
+
+exports.allUsers = async (req, res, next) => {
+  console.log("user",req.user)
+  let data = await userModel.find({});
+
+  
+  res.render('Admin/User/allUser', {
+    data,
+    page_name: 'users',
+  });
+  
+};

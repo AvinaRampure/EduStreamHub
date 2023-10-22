@@ -118,6 +118,9 @@ router.get('/deleteExamTT',requireAuth, controller.deleteQr);
 router.post('/uploadVideo',upload.single('videoFile'), controller.postUpload);
 router.post('/uploadImage',upload.single('thumbnailFile'), controller.postUploadImage);
 
+
+router.get('/allUsers', requireAuth, controller.allUsers);
+
 // router.get('/token', controller.getToken);
 module.exports = router;
 

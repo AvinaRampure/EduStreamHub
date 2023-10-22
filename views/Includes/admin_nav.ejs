@@ -56,6 +56,15 @@
                 <a href="/admin/getCategory">Manage Category </a>
             </div>
         </li>
+
+        <li class="<% if (page_name === 'users') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="/admin/allUsers"><i class="fa fa-solid fa-user"></i>Users</a>
+        </li>
+        
         
         <hr>
         <li class="<% if (page_name === 'settings') { %>

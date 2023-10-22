@@ -30,7 +30,8 @@
                                                                 <% } %>
                                                                     <div class="col-md-4 video">
                                                                         <div class="card mb-4"
-                                                                            onclick="playVideo('<%= videos[i].videoUrl %>')">
+                                                                            href="/user/watch?id=<%= videos[i].id %>"
+                                                                            onclick="playVideo('<%=videos[i].id %>')">
                                                                             <img src="<%= videos[i].imageUrl %>"
                                                                                 class="card-img-top" alt="Course image"
                                                                                 height="250px">
@@ -71,7 +72,7 @@
                                 </div>
                             </div>
                             <h2 class="h3">Latest Audios</h2>
-                            <div class="row video">
+                            <div class="row audio">
                                 <div class="col-md-12">
                                     <div class="audio">
                                         <div class="audio-slides carousel slide" data-ride="carousel"
@@ -84,7 +85,7 @@
                                                                 <!-- Add this div to display videos horizontally -->
                                                                 <% } %>
                                                                     <div class="col-md-4 audio"
-                                                                    onclick="playAudio('<%= audios[i].audioUrl %>')">
+                                                                    onclick="playAudio('<%= audios[i].id %>')">
                                                                         <div class="card mb-4">
                                                                             <img src="<%= audios[i].imageUrl %>"
                                                                                 class="card-img-top" alt="Course image"
@@ -281,12 +282,12 @@
                         // Initially show the first set of slides
                         videoShowSlides();
 
-                        function playVideo(url){
-                            window.open(url,"_blank")
+                        function playVideo(id){
+                            window.open(`/user/watch?id=${id}`,"_blank")
                         }
 
-                        function playAudio(url){
-                            window.open(url,"_blank")
+                        function playAudio(id){
+                            window.open(`/user/listen?id=${id}`,"_blank")
                         }
 
                         function playDoc(url){

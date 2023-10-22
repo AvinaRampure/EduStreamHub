@@ -1,0 +1,99 @@
+<%- include('../../Includes/begin.ejs') %>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.3/css/sb-admin-2.css">
+    <link rel="stylesheet" href="../CSS/admin-dashboard.css">
+    <link rel="stylesheet" href="../CSS/admin-profile.css">
+    <link rel="stylesheet" href="../../CSS/user.css">
+    <div class="container-fluid">
+
+        <div id="wrapper">
+
+            <%- include('../../Includes/user_nav.ejs') %>
+
+                <section id="content-wrapper">
+                    <main role="main" class="pt-5 main">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="audio-container">
+                                        <div class="audio-cover">
+                                            <img src="<%= audio.imageUrl %>" alt="Audio Cover">
+                                        </div>
+                                        <div class="audio-player">
+                                            <audio id="audioPlayer" controls album="<%= audio.imageUrl %>">
+                                                <source src="<%= audio.audioUrl %>" type="audio/mp3">
+                                                Your browser does not support the audio tag.
+                                            </audio>
+                                            <div class="audio-player-controls">
+                                                <button id="rewind-button" class="audio-button rewind">
+                                                    <i class="fas fa-backward"></i>
+                                                </button>
+                                                <button id="play-pause-button" class="audio-button play">
+                                                    <i class="fas fa-play"></i>
+                                                </button>
+                                                <button id="fast-forward-button" class="audio-button fast-forward">
+                                                    <i class="fas fa-forward"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 recommended-audios">
+                                    <h3 class="mt-3">Recommended audios</h3>
+                                    <div class="list-group">
+                                        <% for (let i = 0; i < recommendedAudio.length; i++) { %>
+                                            <a href="/user/listen?id=<%= recommendedAudio[i].id %>" class="list-group-item list-group-item-action">
+                                                <img src="<%= recommendedAudio[i].imageUrl %>" alt="Audio Logo"><p class="mb-0"><%= recommendedAudio[i].name %></p>
+                                                
+                                              </a>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <%- include('../../Includes/admin_end.ejs') %>
+                    </main>
+                    <script>
+                        const audioPlayer = document.getElementById('audioPlayer');
+                        const playPauseButton = document.getElementById('play-pause-button');
+                        const rewindButton = document.getElementById('rewind-button');
+                        const fastForwardButton = document.getElementById('fast-forward-button');
+                    
+                        // Function to update play/pause button icon
+                        function updatePlayPauseButtonIcon() {
+                            if (audioPlayer.paused) {
+                                playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+                            } else {
+                                playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+                            }
+                        }
+                    
+                        audioPlayer.addEventListener('play', () => {
+                            // Audio has started playing, update the play/pause button icon
+                            updatePlayPauseButtonIcon();
+                        });
+                    
+                        audioPlayer.addEventListener('pause', () => {
+                            // Audio has been paused, update the play/pause button icon
+                            updatePlayPauseButtonIcon();
+                        });
+                    
+                        playPauseButton.addEventListener('click', () => {
+                            if (audioPlayer.paused) {
+                                audioPlayer.play();
+                            } else {
+                                audioPlayer.pause();
+                            }
+                    
+                            // Update the play/pause button icon immediately
+                            updatePlayPauseButtonIcon();
+                        });
+                    
+                        rewindButton.addEventListener('click', () => {
+                            audioPlayer.currentTime -= 10;
+                        });
+                    
+                        fastForwardButton.addEventListener('click', () => {
+                            audioPlayer.currentTime += 10;
+                        });
+                    </script>
