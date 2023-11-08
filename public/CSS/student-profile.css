@@ -1016,6 +1016,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    margin: 20px;
     word-wrap: break-word;
     border: 1px solid rgba(0, 0, 0, .05);
     border-radius: .375rem;
@@ -1919,6 +1920,15 @@
       right: 20px;
       left: auto;
     }
+
+    /* Add this to your CSS file or <style> block */
+.select-custom {
+  width: 100%; /* Adjust the width as needed */
+  padding: 8px; /* Adjust the padding as needed */
+  border: 1px solid #ccc; /* Add a border */
+  border-radius: 5px; /* Add rounded corners */
+}
+
   
     @ keyframes show-navbar-dropdown {
       0% {

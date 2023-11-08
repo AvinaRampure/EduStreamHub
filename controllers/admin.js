@@ -18,7 +18,8 @@ const videoModel = require('../database/videoModel')
 const categoryModel = require('../database/categoryModel')
 const documentModel = require('../database/documentModel')
 const audioModel = require('../database/audioModel');
-const userModel = require('../database/userModel')
+const userModel = require('../database/userModel');
+const questionModel = require('../database/questionModel')
 const QRCode = 0
 const { promisify } = require('util');
 
@@ -87,11 +88,21 @@ exports.postLogin = async (req, res, next) => {
 // 1.2 Register
 // ADMIN REGISTER ==> To be commented
 exports.getRegister = (req, res, next) => {
-  res.render('Admin/register');
+
+let questions = [
+"What is your mother's maiden name?",
+"What was your first car?",
+"What elementary school did you attend?",
+"What is the name of the town where you were born?"
+] 
+  res.render('Admin/register',{
+    ques:questions
+  });
 };
 
 exports.postRegister = async (req, res, next) => {
-  const { fname, username, mobile, email, password, confirmPassword } = req.body;
+  console.log(req.body)
+  const { fname, username, mobile, email, password, confirmPassword ,securityQuestion,securityAnswer} = req.body;
   let errors = [];
 
   if (password !== confirmPassword) {
@@ -126,6 +137,12 @@ exports.postRegister = async (req, res, next) => {
       mobile: mobile,
       email: email,
       password: bcrypted_password,
+    });
+
+    let addQuestion = await questionModel.create({
+      question_id:securityQuestion,
+      answer:securityAnswer,
+      userId:register.id
     })
 
     req.flash('success_msg', 'You are now registered and can log in');
@@ -618,7 +635,7 @@ exports.getCategory = async (req, res, next) => {
 };
 exports.postAddCategory = async (req, res, next) => {
   const { cname } = req.body;
-
+ 
   let isNamePresent = await categoryModel.findOne({
     cname: cname.toUpperCase()
   })
@@ -1042,8 +1059,7 @@ exports.getEditFile = async (req, res, next) => {
 
   const docData = await documentModel.find({
     id: docId
-  })
-  console.log("docData",docData);
+  });
 
   const categories = await categoryModel.find({});
   const visibility = [ "Public" , "Unlisted"];
@@ -1514,7 +1530,6 @@ async function upload(fileData, path) {
 exports.allUsers = async (req, res, next) => {
   console.log("user",req.user)
   let data = await userModel.find({});
-
   
   res.render('Admin/User/allUser', {
     data,

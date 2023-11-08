@@ -62,6 +62,14 @@
   font-weight: 600;
   font-size: 18px;
 }
+/* Add this to your CSS file or <style> block */
+.select-custom {
+  width: 100%; /* Adjust the width as needed */
+  padding: 8px; /* Adjust the padding as needed */
+  border: 1px solid #ccc; /* Add a border */
+  border-radius: 5px; /* Add rounded corners */
+}
+
 
 .sidebar-nav > li > a:hover,
 .sidebar-nav > li.active > a {
@@ -87,6 +95,9 @@
 }
 
 #navbar-wrapper .navbar {
+  display: flex;
+ 
+justify-content: center;
   border-width: 0 0 0 0;
   background-color: #222;
   font-size: 24px;
@@ -99,6 +110,10 @@
 }
 
 #navbar-wrapper .navbar a:hover {
+  color: #f8be12;
+}
+
+#navbar-wrapper .navbar .logo {
   color: #f8be12;
 }
 

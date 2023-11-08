@@ -8,6 +8,27 @@
             <% } %>">
             <a class="ddbtn" href="/user/dashboard"><i class="fa fa-home"></i>DASHBOARD</a>
         </li>
+        <li class="<% if (page_name === 'video') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="/user/videoCategory"><i class="fa fa-video"></i>Video</a>
+        </li>
+        <li class="<% if (page_name === 'audio') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="/user/audioCategory"><i class="fa fa-music"></i>Audio</a>
+        </li>
+        <li class="<% if (page_name === 'document') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="/user/docCategory"><i class="fa fa-file"></i>Documents</a>
+        </li>
         <li>
             <a href="/user/logout"><i class="fa fa-sign-out-alt"></i>Logout</a>
         </li>

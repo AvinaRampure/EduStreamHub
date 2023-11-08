@@ -1,0 +1,80 @@
+<%- include('../Includes/begin.ejs') %>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.3/css/sb-admin-2.css">
+    <link rel="stylesheet" href="../CSS/admin-dashboard.css">
+    <link rel="stylesheet" href="../CSS/admin-profile.css">
+
+    <div class="container-fluid">
+        <div id="wrapper">
+            <%- include('../Includes/user_nav.ejs') %>
+                <section id="content-wrapper">
+                    <main role="main" class="pt-5 main">
+                        <!-- Header -->
+                        <section class="py-5">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" id="videoSearch" class="form-control"
+                                            placeholder="Search videos by name">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" onclick="searchVideos()">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Add this structure inside your "Latest Videos Section" -->
+                            <% for (let category in categories) { %>
+                                <div class="category-section" id="<%= category %>">
+                                    <h2 class="h3">
+                                        <%= category %>
+                                    </h2>
+                                    <!-- ... (existing code for video cards) -->
+                                </div>
+                                <div class="row video">
+                                    <% for (let i=0; i < categories[category].videos.length; i++) { %>
+                                        <div class="col-md-3">
+                                            <div class="card mb-4"
+                                                href="/user/watch?id=<%= categories[category].videos[i].id %>"
+                                                onclick="playVideo('<%= categories[category].videos[i].id %>')">
+                                                <img src="<%= categories[category].videos[i].imageUrl %>"
+                                                    class="card-img-top" alt="Course image" height="250px">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">
+                                                        <%= categories[category].videos[i].name %>
+                                                    </h5>
+                                                    <p class="card-text">
+                                                        Author: <%= categories[category].videos[i].author %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                </div>
+                                <% } %>
+                        </section>
+                        <%- include('../Includes/admin_end.ejs') %>
+                    </main>
+                    <script>
+                        function playVideo(id) {
+                            window.open(`/user/watch?id=${id}`, "_blank");
+                        }
+
+                        function searchVideos() {
+                            var searchQuery = document.getElementById('videoSearch').value.trim().toLowerCase();
+                            var videoCards = document.querySelectorAll('.video .card');
+
+                            videoCards.forEach(function (card) {
+                                var cardTitle = card.querySelector('.card-title').innerText.toLowerCase();
+                                if (cardTitle.includes(searchQuery)) {
+                                    card.style.display = 'block';
+                                } else {
+                                    card.style.display = 'none';
+                                }
+                            });
+                        }
+
+
+                    </script>
+                </section>
+        </div>
+    </div>
