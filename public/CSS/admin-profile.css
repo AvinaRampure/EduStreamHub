@@ -67,3 +67,10 @@
   .doc:hover{
     cursor: pointer;
   }
+  .fa-star {
+    color: #686868; /* Yellow color for stars */
+}
+
+.checked {
+    color: #f39c12; /* Orange color for checked stars */
+}

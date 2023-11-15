@@ -56,3 +56,10 @@
 .ddbtn {
   width: 250px;
 }
+.fa-star {
+  color: #686868; /* Yellow color for stars */
+}
+
+.checked {
+  color: #f39c12; /* Orange color for checked stars */
+}

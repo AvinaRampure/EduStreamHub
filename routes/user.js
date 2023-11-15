@@ -20,7 +20,7 @@ router.get('/logout', requireAuth, controller.getLogout);
 
 router.get('/dashboard', requireAuth, controller.getProfile);
 
-router.get('/watch',requireAuth,controller.getVideo)
+router.get('/watch',requireAuth,controller.getVideo);
 router.get('/listen',requireAuth,controller.getAudio);
 
 
@@ -29,5 +29,7 @@ router.get('/videoCategory', requireAuth, controller.getVideoByCategory);
 router.get('/audioCategory', requireAuth, controller.getAudioByCategory);
 
 router.get('/docCategory', requireAuth, controller.getDocByCategory);
+
+router.post('/rating',requireAuth,controller.postRating);
 
 module.exports = router;

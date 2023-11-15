@@ -11,8 +11,8 @@ const adminModel = require('../database/adminModel');
 const userModel = require('../database/userModel');
 const videoModel = require('../database/videoModel');
 const audioModel = require('../database/audioModel');
-const documentModel = require('../database/documentModel')
-
+const documentModel = require('../database/documentModel');
+const ratingModel = require('../database/ratingModel');
 
 exports.getLogin = (req, res, next) => {
     res.render('User/login');
@@ -158,7 +158,7 @@ exports.getLogout = (req, res, next) => {
 // 2 Get Video
 
 exports.getVideo =async (req, res, next) => {
-    
+    console.log(req.user,'][][]][]')
     let id = req.query.id ;
     let video = await videoModel.findOne({id,visibility: "Public"});
 
@@ -177,8 +177,18 @@ exports.getVideo =async (req, res, next) => {
         }
     }
 
+    let ratings = await ratingModel.find({userId : req.user , mediaId : video.id});
+    let sum = 0
+    for(let obj of ratings){
+        sum += obj.rating
+    }
+
+    let averageRating = sum/ratings.length;
+
     res.render('User/Video/video', {
+        averageRating,
         video,
+        userId :req.user,
         recommendedVideos,
         page_name: 'Dashboard',
     });
@@ -282,4 +292,19 @@ exports.getDocByCategory = async (req, res, next) => {
         documents: document,
         page_name: 'document',
     });
+};
+
+exports.postRating = async (req, res, next) => {
+   let query = req.query;
+    let obj = {};
+
+    obj['ratingId'] = uuidv4();
+    obj['rating'] = query.rating;
+    obj['userId'] = query.userId;
+    obj['mediaId'] = query.videoId;
+
+    console.log(obj,'obj');
+
+    let addRating = await ratingModel.updateOne({ ['userId']: obj.userId , ['mediaId'] : obj.mediaId },obj, { upsert: true });
+    res.status(200).send({message:'Rating added',data : addRating});
 };

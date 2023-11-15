@@ -22,30 +22,190 @@
                                             Your browser does not support the video tag.
                                         </video>
                                     </div>
-                                    <h1 class="mt-3 font-weight-bold"><%= video.name %></h1>
+                                    <h1 class="mt-3 font-weight-bold">
+                                        <%= video.name %>
+                                    </h1>
                                     <div class="d-flex align-items-center mt-3">
                                         <!-- Author Name -->
-                                        <p class="font-weight-normal">Uploaded by <span class="font-weight-bold font-italic"><%= video.author %></span></p>
+                                        <p class="font-weight-normal">Uploaded by <span
+                                                class="font-weight-bold font-italic">
+                                                <%= video.author %>
+                                            </span>
+                                            | Rating:
+                                            <!-- Display icon based on the average rating -->
+                                            <span id="averageRating">
+
+                                                <% if (averageRating>= 4.5) { %>
+                                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                        class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                        class="fas fa-star"></i>
+                                                    <% } else if (averageRating>= 3.5) { %>
+                                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="far fa-star"></i>
+                                                        <% } else if (averageRating>= 2.5) { %>
+                                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                                class="fas fa-star"></i><i class="far fa-star"></i><i
+                                                                class="far fa-star"></i>
+                                                            <% } else if (averageRating>= 1.5) { %>
+                                                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                                    class="far fa-star"></i><i
+                                                                    class="far fa-star"></i><i class="far fa-star"></i>
+                                                                <% } else if (averageRating>= 0.5) { %>
+                                                                    <i class="fas fa-star"></i><i
+                                                                        class="far fa-star"></i><i
+                                                                        class="far fa-star"></i><i
+                                                                        class="far fa-star"></i><i
+                                                                        class="far fa-star"></i>
+                                                                    <% } else { %>
+                                                                        <i class="far fa-star"></i><i
+                                                                            class="far fa-star"></i><i
+                                                                            class="far fa-star"></i><i
+                                                                            class="far fa-star"></i><i
+                                                                            class="far fa-star"></i>
+                                                                        <% } %>
+                                                                            <%= averageRating.toFixed(1) %> out of 5
+
+
+                                            </span>
+                                        </p>
+
                                     </div>
                                     <hr>
-                                    <p class="mt-3"><%= video.description %></p>
+                                    <p class="mt-3">
+                                        <%= video.description %>
+                                    </p>
+                                    <hr>
+                                    <!-- Rating Section -->
+                                    <div class="mt-4">
+                                        <h4 class="font-weight-bold">Rating</h4>
+                                        <div class="d-flex align-items-center">
+                                            <!-- Display stars/icons based on the rating value -->
+                                            <% for (let i=1; i <=5; i++) { %>
+                                                <span
+                                                    class="fa fa-star <% if (i <= video.rating) { %>checked<% } %>"></span>
+                                                <% } %>
+                                                    <p class="ml-2 mb-0">
+                                                        <%= video.rating %> out of 5
+                                                    </p>
+                                        </div>
+
+                                        <!-- Button to submit rating -->
+                                        <button class="btn btn-primary mt-3" id="submitRatingBtn"
+                                            data-video-id="<%= video.id %>" data-user-id="<%= userId %>">Submit
+                                            Rating</button>
+                                    </div>
+
                                 </div>
-                    
+
                                 <!-- Recommended Videos -->
                                 <div class="col-lg-4 recommended-videos">
                                     <h3 class="mt-3">Recommended Videos</h3>
                                     <div class="list-group">
-                                        <% for (let i = 0; i < recommendedVideos.length; i++) { %>
-                                            <a href="/user/watch?id=<%= recommendedVideos[i].id %>" class="list-group-item list-group-item-action">
-                                                <img src="<%= recommendedVideos[i].imageUrl %>" alt="Video Logo"><p class="mb-0"><%= recommendedVideos[i].name %></p>
-                                                
-                                              </a>
-                                        <% } %>
+                                        <% for (let i=0; i < recommendedVideos.length; i++) { %>
+                                            <a href="/user/watch?id=<%= recommendedVideos[i].id %>"
+                                                class="list-group-item list-group-item-action">
+                                                <img src="<%= recommendedVideos[i].imageUrl %>" alt="Video Logo">
+                                                <p class="mb-0">
+                                                    <%= recommendedVideos[i].name %>
+                                                </p>
+                                            </a>
+                                            <% } %>
                                     </div>
                                 </div>
                             </div>
-                            </div>
-                    
+                        </div>
+
                         <%- include('../../Includes/admin_end.ejs') %>
                     </main>
-                  
+
+                    <!-- JavaScript for Rating Section -->
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+    // Get all star elements
+    const stars = document.querySelectorAll(".fa-star");
+
+    // Function to update rating based on the selected stars
+    function updateRating() {
+        let rating = 0;
+        for (let i = 0; i < 5; i++) {
+            if (stars[i].classList.contains("checked")) {
+                rating++;
+            }
+        }
+        document.querySelector(".mb-0").textContent = rating + " out of 5";
+    }
+
+    // Add click event listener to the 5th star
+    stars[4].addEventListener("click", function () {
+        // Loop through all stars and mark them as checked
+        for (let i = 0; i < 5; i++) {
+            stars[i].classList.add("checked");
+        }
+        updateRating();
+    });
+
+    // Add click event listeners to all stars to handle individual selections
+    for (let i = 0; i < 5; i++) {
+        stars[i].addEventListener("click", function () {
+            // Loop through stars and mark them as checked or unchecked based on the click
+            for (let j = 0; j <= i; j++) {
+                stars[j].classList.add("checked");
+            }
+            for (let j = i + 1; j < 5; j++) {
+                stars[j].classList.remove("checked");
+            }
+            updateRating();
+        });
+    }
+
+    // Add click event listener to the submit rating button
+    document.getElementById("submitRatingBtn").addEventListener("click", function () {
+        // Get the video ID from the data attribute
+        const videoId = this.getAttribute("data-video-id");
+
+        // Get the user ID (replace this with your logic to get the user ID)
+        const userId = this.getAttribute("data-user-id");
+
+        // Get the rating value
+        let rating = 0;
+        for (let i = 0; i < 5; i++) {
+            if (stars[i].classList.contains("checked")) {
+                rating++;
+            }
+        }
+
+        // Make an API call to submit the rating
+        fetch(`/user/rating?videoId=${videoId}&userId=${userId}&rating=${rating}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Rating submitted:', data);
+            })
+            .catch(error => {
+                console.error('Error submitting rating:', error);
+            });
+
+        // Disable star interactivity after submitting the rating
+        disableStarInteractivity();
+    });
+
+    // Disable star interactivity if average rating is loaded
+    const averageRating = "<%= averageRating %>"; // Add the actual average rating from your server-side code
+    if (averageRating !== null && averageRating !== undefined) {
+        disableStarInteractivity();
+    }
+
+    function disableStarInteractivity() {
+        for (let i = 0; i < 5; i++) {
+            stars[i].style.pointerEvents = 'none';
+            stars[i].style.cursor = 'not-allowed';
+        }
+    }
+});
+
+                    </script>
