@@ -83,7 +83,7 @@
                                             <!-- Display stars/icons based on the rating value -->
                                             <% for (let i=1; i <=5; i++) { %>
                                                 <span
-                                                    class="fa fa-star <% if (i <= video.rating) { %>checked<% } %>"></span>
+                                                    class="fa fa-star star <% if (i <= video.rating) { %>checked<% } %>"></span>
                                                 <% } %>
                                                     <p class="ml-2 mb-0">
                                                         <%= video.rating %> out of 5
@@ -122,90 +122,90 @@
                     <!-- JavaScript for Rating Section -->
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-    // Get all star elements
-    const stars = document.querySelectorAll(".fa-star");
+                            // Get all star elements
+                            const stars = document.querySelectorAll(".star");
+                            const averageRating = document.querySelectorAll("#averageRating");
+                            // Function to update rating based on the selected stars
+                            function updateRating() {
+                                let rating = 0;
+                                for (let i = 0; i < 5; i++) {
+                                    if (stars[i].classList.contains("checked")) {
+                                        rating++;
+                                    }
+                                }
+                                document.querySelector(".mb-0").textContent = rating + " out of 5";
+                            }
 
-    // Function to update rating based on the selected stars
-    function updateRating() {
-        let rating = 0;
-        for (let i = 0; i < 5; i++) {
-            if (stars[i].classList.contains("checked")) {
-                rating++;
-            }
-        }
-        document.querySelector(".mb-0").textContent = rating + " out of 5";
-    }
+                            // Add click event listener to the 5th star
+                            stars[4].addEventListener("click", function () {
+                                // Loop through all stars and mark them as checked
+                                for (let i = 0; i < 5; i++) {
+                                    stars[i].classList.add("checked");
+                                }
+                                updateRating();
+                            });
 
-    // Add click event listener to the 5th star
-    stars[4].addEventListener("click", function () {
-        // Loop through all stars and mark them as checked
-        for (let i = 0; i < 5; i++) {
-            stars[i].classList.add("checked");
-        }
-        updateRating();
-    });
+                            // Add click event listeners to all stars to handle individual selections
+                            for (let i = 0; i < 5; i++) {
+                                stars[i].addEventListener("click", function () {
+                                    // Loop through stars and mark them as checked or unchecked based on the click
+                                    for (let j = 0; j <= i; j++) {
+                                        stars[j].classList.add("checked");
+                                    }
+                                    for (let j = i + 1; j < 5; j++) {
+                                        stars[j].classList.remove("checked");
+                                    }
+                                    updateRating();
+                                });
+                            }
 
-    // Add click event listeners to all stars to handle individual selections
-    for (let i = 0; i < 5; i++) {
-        stars[i].addEventListener("click", function () {
-            // Loop through stars and mark them as checked or unchecked based on the click
-            for (let j = 0; j <= i; j++) {
-                stars[j].classList.add("checked");
-            }
-            for (let j = i + 1; j < 5; j++) {
-                stars[j].classList.remove("checked");
-            }
-            updateRating();
-        });
-    }
+                            // Add click event listener to the submit rating button
+                            document.getElementById("submitRatingBtn").addEventListener("click", function () {
+                                // Get the video ID from the data attribute
+                                const videoId = this.getAttribute("data-video-id");
 
-    // Add click event listener to the submit rating button
-    document.getElementById("submitRatingBtn").addEventListener("click", function () {
-        // Get the video ID from the data attribute
-        const videoId = this.getAttribute("data-video-id");
+                                // Get the user ID (replace this with your logic to get the user ID)
+                                const userId = this.getAttribute("data-user-id");
 
-        // Get the user ID (replace this with your logic to get the user ID)
-        const userId = this.getAttribute("data-user-id");
+                                // Get the rating value
+                                let rating = 0;
+                                for (let i = 0; i < 5; i++) {
+                                    if (stars[i].classList.contains("checked")) {
+                                        rating++;
+                                    }
+                                }
 
-        // Get the rating value
-        let rating = 0;
-        for (let i = 0; i < 5; i++) {
-            if (stars[i].classList.contains("checked")) {
-                rating++;
-            }
-        }
+                                // Make an API call to submit the rating
+                                fetch(`/user/rating?videoId=${videoId}&userId=${userId}&rating=${rating}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Rating submitted:', data);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error submitting rating:', error);
+                                    });
 
-        // Make an API call to submit the rating
-        fetch(`/user/rating?videoId=${videoId}&userId=${userId}&rating=${rating}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Rating submitted:', data);
-            })
-            .catch(error => {
-                console.error('Error submitting rating:', error);
-            });
+                                // Disable star interactivity after submitting the rating
+                                disableStarInteractivity();
+                            });
 
-        // Disable star interactivity after submitting the rating
-        disableStarInteractivity();
-    });
+                            // Disable star interactivity if average rating is loaded
+                            const rating = "<%= averageRating %>"; // Add the actual average rating from your server-side code
+                            if (rating !== null && rating !== undefined) {
+                                disableStarInteractivity();
+                            }
 
-    // Disable star interactivity if average rating is loaded
-    const averageRating = "<%= averageRating %>"; // Add the actual average rating from your server-side code
-    if (averageRating !== null && averageRating !== undefined) {
-        disableStarInteractivity();
-    }
-
-    function disableStarInteractivity() {
-        for (let i = 0; i < 5; i++) {
-            stars[i].style.pointerEvents = 'none';
-            stars[i].style.cursor = 'not-allowed';
-        }
-    }
-});
+                            function disableStarInteractivity() {
+                                for (let i = 0; i < 5; i++) {
+                                    averageRating.style.pointerEvents = 'none';
+                                    averageRating.style.cursor = 'not-allowed';
+                                }
+                            }
+                        });
 
                     </script>

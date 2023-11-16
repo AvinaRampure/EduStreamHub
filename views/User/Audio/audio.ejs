@@ -17,8 +17,51 @@
                                 <div class="col-md-8">
                                     <div class="audio-container">
                                         <div class="audio-cover">
-                                            <img src="<%= audio.imageUrl %>" alt="Audio Cover">
+                                            <img src="<%= audio.imageUrl %>" alt="Audio Cover" class="rounded">
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="audio-details">
+                                        <h1 class="mt-3 font-weight-bold text-primary">
+                                            <%= audio.name %>
+                                        </h1>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <p class="font-weight-normal text-muted">Uploaded by <span
+                                                    class="font-weight-bold font-italic">
+                                                    <%= audio.author %>
+                                                </span> | Rating:
+                                                <span id="averageRating" class="text-warning">
+                                                    <% if (averageRating >= 4.5) { %>
+                                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="fas fa-star"></i>
+                                                    <% } else if (averageRating >= 3.5) { %>
+                                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="far fa-star"></i>
+                                                    <% } else if (averageRating >= 2.5) { %>
+                                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="fas fa-star"></i><i class="far fa-star"></i><i
+                                                            class="far fa-star"></i>
+                                                    <% } else if (averageRating >= 1.5) { %>
+                                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                                            class="far fa-star"></i><i class="far fa-star"></i><i
+                                                            class="far fa-star"></i>
+                                                    <% } else if (averageRating >= 0.5) { %>
+                                                        <i class="fas fa-star"></i><i class="far fa-star"></i><i
+                                                            class="far fa-star"></i><i class="far fa-star"></i><i
+                                                            class="far fa-star"></i>
+                                                    <% } else { %>
+                                                        <i class="far fa-star"></i><i class="far fa-star"></i><i
+                                                            class="far fa-star"></i><i class="far fa-star"></i><i
+                                                            class="far fa-star"></i>
+                                                    <% } %>
+                                                    <%= averageRating.toFixed(1) %> out of 5
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    </div>
+                                        <hr>
                                         <div class="audio-player">
                                             <audio id="audioPlayer" controls album="<%= audio.imageUrl %>">
                                                 <source src="<%= audio.audioUrl %>" type="audio/mp3">
@@ -36,16 +79,34 @@
                                                 </button>
                                             </div>
                                         </div>
+                                    
+        
+                                        <div class="mt-4">
+                                            <h4 class="font-weight-bold text-primary">Rating</h4>
+                                            <div class="d-flex align-items-center">
+                                                <% for (let i = 1; i <= 5; i++) { %>
+                                                    <span class="fa fa-star star <% if (i <= audio.rating) { %>checked<% } %>"></span>
+                                                <% } %>
+                                                <p class="ml-2 mb-0 text-muted">
+                                                    <%= audio.rating %> out of 5
+                                                </p>
+                                            </div>
+                                            <button class="btn btn-primary mt-3" id="submitRatingBtn" data-video-id="<%= audio.id %>"
+                                                data-user-id="<%= userId %>">Submit Rating</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 recommended-audios">
-                                    <h3 class="mt-3">Recommended audios</h3>
+                                    <h3 class="mt-3 text-primary">Recommended Audios</h3>
                                     <div class="list-group">
                                         <% for (let i = 0; i < recommendedAudio.length; i++) { %>
-                                            <a href="/user/listen?id=<%= recommendedAudio[i].id %>" class="list-group-item list-group-item-action">
-                                                <img src="<%= recommendedAudio[i].imageUrl %>" alt="Audio Logo"><p class="mb-0"><%= recommendedAudio[i].name %></p>
-                                                
-                                              </a>
+                                            <a href="/user/listen?id=<%= recommendedAudio[i].id %>"
+                                                class="list-group-item list-group-item-action">
+                                                <img src="<%= recommendedAudio[i].imageUrl %>" alt="Audio Logo" class="rounded">
+                                                <p class="mb-0 text-dark">
+                                                    <%= recommendedAudio[i].name %>
+                                                </p>
+                                            </a>
                                         <% } %>
                                     </div>
                                 </div>
@@ -58,7 +119,7 @@
                         const playPauseButton = document.getElementById('play-pause-button');
                         const rewindButton = document.getElementById('rewind-button');
                         const fastForwardButton = document.getElementById('fast-forward-button');
-                    
+
                         // Function to update play/pause button icon
                         function updatePlayPauseButtonIcon() {
                             if (audioPlayer.paused) {
@@ -67,33 +128,121 @@
                                 playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
                             }
                         }
-                    
+
                         audioPlayer.addEventListener('play', () => {
                             // Audio has started playing, update the play/pause button icon
                             updatePlayPauseButtonIcon();
                         });
-                    
+
                         audioPlayer.addEventListener('pause', () => {
                             // Audio has been paused, update the play/pause button icon
                             updatePlayPauseButtonIcon();
                         });
-                    
+
                         playPauseButton.addEventListener('click', () => {
                             if (audioPlayer.paused) {
                                 audioPlayer.play();
                             } else {
                                 audioPlayer.pause();
                             }
-                    
+
                             // Update the play/pause button icon immediately
                             updatePlayPauseButtonIcon();
                         });
-                    
+
                         rewindButton.addEventListener('click', () => {
                             audioPlayer.currentTime -= 10;
                         });
-                    
+
                         fastForwardButton.addEventListener('click', () => {
                             audioPlayer.currentTime += 10;
                         });
+
+                        document.addEventListener("DOMContentLoaded", function () {
+                            // Get all star elements
+                            const stars = document.querySelectorAll(".star");
+                            const averageRating = document.querySelectorAll("#averageRating");
+                            // Function to update rating based on the selected stars
+                            function updateRating() {
+                                let rating = 0;
+                                for (let i = 0; i < 5; i++) {
+                                    if (stars[i].classList.contains("checked")) {
+                                        rating++;
+                                    }
+                                }
+                                document.querySelector(".mb-0").textContent = rating + " out of 5";
+                            }
+
+                            // Add click event listener to the 5th star
+                            stars[4].addEventListener("click", function () {
+                                // Loop through all stars and mark them as checked
+                                for (let i = 0; i < 5; i++) {
+                                    stars[i].classList.add("checked");
+                                }
+                                updateRating();
+                            });
+
+                            // Add click event listeners to all stars to handle individual selections
+                            for (let i = 0; i < 5; i++) {
+                                stars[i].addEventListener("click", function () {
+                                    // Loop through stars and mark them as checked or unchecked based on the click
+                                    for (let j = 0; j <= i; j++) {
+                                        stars[j].classList.add("checked");
+                                    }
+                                    for (let j = i + 1; j < 5; j++) {
+                                        stars[j].classList.remove("checked");
+                                    }
+                                    updateRating();
+                                });
+                            }
+
+                            // Add click event listener to the submit rating button
+                            document.getElementById("submitRatingBtn").addEventListener("click", function () {
+                                // Get the video ID from the data attribute
+                                const videoId = this.getAttribute("data-video-id");
+
+                                // Get the user ID (replace this with your logic to get the user ID)
+                                const userId = this.getAttribute("data-user-id");
+
+                                // Get the rating value
+                                let rating = 0;
+                                for (let i = 0; i < 5; i++) {
+                                    if (stars[i].classList.contains("checked")) {
+                                        rating++;
+                                    }
+                                }
+
+                                // Make an API call to submit the rating
+                                fetch(`/user/rating?videoId=${videoId}&userId=${userId}&rating=${rating}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Rating submitted:', data);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error submitting rating:', error);
+                                    });
+
+                                // Disable star interactivity after submitting the rating
+                                disableStarInteractivity();
+                            });
+
+                            // Disable star interactivity if average rating is loaded
+                            const rating = "<%= averageRating %>"; // Add the actual average rating from your server-side code
+                            if (rating !== null && rating !== undefined) {
+                                disableStarInteractivity();
+                            }
+
+                            function disableStarInteractivity() {
+                                for (let i = 0; i < 5; i++) {
+                                    averageRating.style.pointerEvents = 'none';
+                                    averageRating.style.cursor = 'not-allowed';
+                                }
+                            }
+                        });
                     </script>
+                    

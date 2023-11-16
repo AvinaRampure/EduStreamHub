@@ -120,7 +120,7 @@ exports.getProfile = async (req, res, next) => {
         video[i]['author'] = author.username
     }
 
-    let audio = await audioModel.find({visibility : "Public"}).limit(10).
+    let audio = await audioModel.find({ visibility: "Public" }).limit(10).
         sort({ createdAt: -1 });
 
     for (let i = 0; i < audio.length; i++) {
@@ -130,7 +130,7 @@ exports.getProfile = async (req, res, next) => {
         audio[i]['author'] = author.username
     }
 
-    let doc = await documentModel.find({visibility : "Public"}).limit(10).
+    let doc = await documentModel.find({ visibility: "Public" }).limit(10).
         sort({ createdAt: -1 });
 
     for (let i = 0; i < doc.length; i++) {
@@ -157,59 +157,77 @@ exports.getLogout = (req, res, next) => {
 
 // 2 Get Video
 
-exports.getVideo =async (req, res, next) => {
-    console.log(req.user,'][][]][]')
-    let id = req.query.id ;
-    let video = await videoModel.findOne({id,visibility: "Public"});
+exports.getVideo = async (req, res, next) => {
 
-    let author = await adminModel.findOne({admin_id : video.userId});
-    
-    if(author){
-        video['author'] =  author.username
+    let id = req.query.id;
+    let video = await videoModel.findOne({ id, visibility: "Public" });
+
+    let author = await adminModel.findOne({ admin_id: video.userId });
+
+    if (author) {
+        video['author'] = author.username
     }
 
 
-    let recommendedVideos = await videoModel.find({category : video.category , visibility: "Public"});
+    let recommendedVideos = await videoModel.find({ category: video.category, visibility: "Public" });
 
-    if(recommendedVideos.length){
-        for(let i=0 ;i < recommendedVideos.length ;i++){
+    if (recommendedVideos.length) {
+        for (let i = 0; i < recommendedVideos.length; i++) {
 
         }
     }
 
-    let ratings = await ratingModel.find({userId : req.user , mediaId : video.id});
+    let ratings = await ratingModel.find({ userId: req.user, mediaId: video.id });
     let sum = 0
-    for(let obj of ratings){
-        sum += obj.rating
+    let averageRating = 0
+
+    if (ratings.length) {
+        for (let obj of ratings) {
+            sum += obj.rating
+        }
+
+        averageRating = sum / ratings.length;
+
     }
-
-    let averageRating = sum/ratings.length;
-
     res.render('User/Video/video', {
         averageRating,
         video,
-        userId :req.user,
+        userId: req.user,
         recommendedVideos,
         page_name: 'Dashboard',
     });
 }
 
-exports.getAudio =async (req, res, next) => {
-    
-    let id = req.query.id ;
-    let audio = await audioModel.findOne({id,visibility: "Public"});
+exports.getAudio = async (req, res, next) => {
 
-    let author = await audioModel.findOne({admin_id : audio.userId});
-    
-    if(author){
-        audio['author'] =  author.username
+    let id = req.query.id;
+    let audio = await audioModel.findOne({ id, visibility: "Public" });
+
+    let author = await adminModel.findOne({ admin_id: audio.userId });
+
+    if (author) {
+        audio['author'] = author.username
     }
 
 
-    let recommendedAudio = await audioModel.find({category : audio.category , visibility: "Public"});
+    let recommendedAudio = await audioModel.find({ category: audio.category, visibility: "Public" });
 
+    let ratings = await ratingModel.find({ userId: req.user, mediaId: audio.id });
+    let sum = 0
+    let averageRating = 0
+
+    if (ratings.length) {
+        for (let obj of ratings) {
+            sum += obj.rating
+        }
+
+        averageRating = sum / ratings.length;
+
+    }
 
     res.render('User/Audio/audio', {
+        averageRating,
+        userId: req.user,
         audio,
         recommendedAudio,
         page_name: 'Dashboard',
@@ -220,23 +238,23 @@ exports.getVideoByCategory = async (req, res, next) => {
 
     let video = await videoModel.find({}).
         sort({ createdAt: 1 });
-    let categories ={}
+    let categories = {}
 
     for (let i = 0; i < video.length; i++) {
         let author = await adminModel.findOne({ admin_id: video[i].userId });
         let category = video[i].category
         video[i]['author'] = author.username;
 
-        if(categories[category]){
+        if (categories[category]) {
             categories[`${category}`].videos.push(video[i])
-        }else{
-            categories[`${category}`] = {videos : []}
-            categories[`${category}`].videos.push(video[i]) 
+        } else {
+            categories[`${category}`] = { videos: [] }
+            categories[`${category}`].videos.push(video[i])
         }
     }
 
     res.render('User/video_category', {
-        categories : categories,
+        categories: categories,
         videos: video,
         page_name: 'video',
     });
@@ -246,23 +264,23 @@ exports.getAudioByCategory = async (req, res, next) => {
 
     let audio = await audioModel.find({}).
         sort({ createdAt: 1 });
-    let categories ={}
+    let categories = {}
 
     for (let i = 0; i < audio.length; i++) {
         let author = await adminModel.findOne({ admin_id: audio[i].userId });
         let category = audio[i].category
         audio[i]['author'] = author.username;
 
-        if(categories[category]){
+        if (categories[category]) {
             categories[`${category}`].audios.push(audio[i])
-        }else{
-            categories[`${category}`] = {audios : []}
-            categories[`${category}`].audios.push(audio[i]) 
+        } else {
+            categories[`${category}`] = { audios: [] }
+            categories[`${category}`].audios.push(audio[i])
         }
     }
-    
+
     res.render('User/audio_category', {
-        categories : categories,
+        categories: categories,
         audios: audio,
         page_name: 'audio',
     });
@@ -272,30 +290,30 @@ exports.getDocByCategory = async (req, res, next) => {
 
     let document = await documentModel.find({}).
         sort({ createdAt: 1 });
-    let categories ={}
+    let categories = {}
 
     for (let i = 0; i < document.length; i++) {
         let author = await adminModel.findOne({ admin_id: document[i].userId });
         let category = document[i].category
         document[i]['author'] = author.username;
 
-        if(categories[category]){
+        if (categories[category]) {
             categories[`${category}`].documents.push(document[i])
-        }else{
-            categories[`${category}`] = {documents : []}
-            categories[`${category}`].documents.push(document[i]) 
+        } else {
+            categories[`${category}`] = { documents: [] }
+            categories[`${category}`].documents.push(document[i])
         }
     }
-    
+
     res.render('User/doc_category', {
-        categories : categories,
+        categories: categories,
         documents: document,
         page_name: 'document',
     });
 };
 
 exports.postRating = async (req, res, next) => {
-   let query = req.query;
+    let query = req.query;
     let obj = {};
 
     obj['ratingId'] = uuidv4();
@@ -303,8 +321,8 @@ exports.postRating = async (req, res, next) => {
     obj['userId'] = query.userId;
     obj['mediaId'] = query.videoId;
 
-    console.log(obj,'obj');
+    console.log(obj, 'obj');
 
-    let addRating = await ratingModel.updateOne({ ['userId']: obj.userId , ['mediaId'] : obj.mediaId },obj, { upsert: true });
-    res.status(200).send({message:'Rating added',data : addRating});
+    let addRating = await ratingModel.updateOne({ ['userId']: obj.userId, ['mediaId']: obj.mediaId }, obj, { upsert: true });
+    res.status(200).send({ message: 'Rating added', data: addRating });
 };
