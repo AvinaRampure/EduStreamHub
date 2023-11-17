@@ -114,7 +114,9 @@ justify-content: center;
 }
 
 #navbar-wrapper .navbar .logo {
-  color: #f8be12;
+  font-family: 'Pacifico', cursive;
+  font-size: 2rem;
+  color: #F06292;
 }
 
 #content-wrapper {

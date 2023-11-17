@@ -59,7 +59,9 @@ router.get('/settings/deleteStaff/:id', requireAuth, controller.deleteStaff);
 // 3.STUDENTS
 // 3.1 Add Student
 router.get('/addCategory', requireAuth, controller.getCategory);
-router.post('/addCategory', controller.postAddCategory);
+router.post('/addCategory',requireAuth, controller.postAddCategory);
+router.get('/getCategory', requireAuth,controller.getAllCategory);
+router.get('/edit/deleteCategory/:id', requireAuth, controller.deleteCategory);
 // 3.2 Get Students on query
 router.get('/getStudent', requireAuth, controller.getRelevantStudent);
 router.post('/getStudent', requireAuth, controller.postRelevantStudent);

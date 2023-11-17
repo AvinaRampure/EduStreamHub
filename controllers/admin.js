@@ -647,7 +647,8 @@ exports.postAddCategory = async (req, res, next) => {
 
   const category = await categoryModel.create({
     id: uuidv4(),
-    cname: cname.toUpperCase()
+    cname: cname.toUpperCase(),
+    userId : req.user
   })
 
   console.log('category', category);
@@ -656,6 +657,32 @@ exports.postAddCategory = async (req, res, next) => {
   res.redirect('/admin/profile');
 };
 
+exports.getAllCategory = async (req, res, next) => {
+  console.log("user",req.user)
+  let data = await categoryModel.find({userId : req.user});
+  
+  res.render('Admin/Category/getCategory', {
+    data,
+    page_name: 'category',
+  });
+  
+};
+
+exports.deleteCategory = async (req, res, next) => {
+
+  const id = req.params.id;
+
+  let checkCategory = await categoryModel.find({userId:req.user,id});
+  if(checkCategory.length == 0){
+    req.flash('error', 'You Can"t Delete Category Of Other Admins');
+    res.redirect('/admin/getCategory');
+    return
+  }
+
+  await categoryModel.deleteOne({ id });
+  res.redirect('/admin/getCategory');
+
+}
 // 3.2 Get students on query
 exports.getRelevantStudent = async (req, res, next) => {
 
@@ -1291,7 +1318,7 @@ exports.deleteAudio = async (req, res, next) => {
   }
 
   await audioModel.deleteOne({ id });
-  res.redirect('/admin/getAllAudio');
+  res.redirect('/admin/getAllAudios');
 
 }
 // 6.4 Modify existing courses

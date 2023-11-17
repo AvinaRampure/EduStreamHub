@@ -24,49 +24,28 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th scope="col">#</th>
-                                                        <th scope="col">File</th>
-                                                        <th scope="col">Title</th>
-                                                        <th scope="col">Visibility</th>
-                                                        <th scope="col">Date</th>
-                                                        <th scope="col">Edit Document</th>
+                                                        <th scope="col">Category</th>
+                                                        <th scope="col">Delete Category</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="docTable">
+                                                <tbody id="audioTable">
                                                     <% for(let i=0; i < data.length; i++) { %>
                                                         <tr>
                                                             <th scope="row">
                                                                 <%= i+1 %>
                                                             </th>
                                                             <td>
-                                                                <img src="<%= data[i].imageUrl %>" alt="Image Preview" width="200">
+                                                                <%= data[i].cname %>
                                                             </td>
                                                             <td>
-                                                                <%= data[i].name %>
-                                                            </td>
-                                                            <td>
-                                                                <% if(data[i].visibility == "Public") { %>
-                                                                    <i class="fa fa-regular fa-eye"></i> 
-                                                                    <%= data[i].visibility %>
-                                                                <% } else { %>
-                                                                    <i class="fa fa-eye-slash"></i> 
-                                                                    <%= data[i].visibility %>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <%= data[i].uploadedAt %>
-                                                                <br>
-                                                                <%= data[i].videoStatus %>
-                                                            </td>
-                                                            <td>
-                                                                <a href="/admin/edit/file/<%= data[i].id %>"
-                                                                    class="btn btn-sm btn-primary">Edit Document</a>
-                                                                <a href="/admin/edit/deleteFile/<%= data[i].id %>"
-                                                                    class="btn btn-sm btn-danger">Delete Document</a>
+                                                                <a href="/admin/edit/deleteCategory/<%= data[i].id %>"
+                                                                    class="btn btn-sm btn-danger">Delete Category</a>
                                                             </td>
                                                         </tr>
                                                     <% } %>
                                                 </tbody>
                                             </table>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -85,13 +64,13 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var searchInput = document.getElementById("searchInput");
-        var docTable = document.getElementById("docTable");
+        var audioTable = document.getElementById("audioTable");
 
         searchInput.addEventListener("keyup", function () {
             var searchText = searchInput.value.toLowerCase();
 
             // Loop through table rows
-            var rows = docTable.getElementsByTagName("tr");
+            var rows = audioTable.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) { // Start from 1 to skip the table header row
                 var titleCell = rows[i].getElementsByTagName("td")[1]; // Get the third cell (title)
                 var title = titleCell.textContent.toLowerCase();

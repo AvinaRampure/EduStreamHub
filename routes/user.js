@@ -16,7 +16,7 @@ router.post('/login', controller.postLogin);
 router.get('/register', controller.getRegister);
 router.post('/register', controller.postRegister);
 
-router.get('/logout', requireAuth, controller.getLogout);
+router.get('/logout', requireAuth, controller.getLogout)
 
 router.get('/dashboard', requireAuth, controller.getProfile);
 
