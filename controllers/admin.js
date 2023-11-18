@@ -89,20 +89,20 @@ exports.postLogin = async (req, res, next) => {
 // ADMIN REGISTER ==> To be commented
 exports.getRegister = (req, res, next) => {
 
-let questions = [
-"What is your mother's maiden name?",
-"What was your first car?",
-"What elementary school did you attend?",
-"What is the name of the town where you were born?"
-] 
-  res.render('Admin/register',{
-    ques:questions
+  let questions = [
+    "What is your mother's maiden name?",
+    "What was your first car?",
+    "What elementary school did you attend?",
+    "What is the name of the town where you were born?"
+  ]
+  res.render('Admin/register', {
+    ques: questions
   });
 };
 
 exports.postRegister = async (req, res, next) => {
   console.log(req.body)
-  const { fname, username, mobile, email, password, confirmPassword ,securityQuestion,securityAnswer} = req.body;
+  const { fname, username, mobile, email, password, confirmPassword, securityQuestion, securityAnswer } = req.body;
   let errors = [];
 
   if (password !== confirmPassword) {
@@ -140,9 +140,9 @@ exports.postRegister = async (req, res, next) => {
     });
 
     let addQuestion = await questionModel.create({
-      question_id:securityQuestion,
-      answer:securityAnswer,
-      userId:register.id
+      question_id: securityQuestion,
+      answer: securityAnswer,
+      userId: register.id
     })
 
     req.flash('success_msg', 'You are now registered and can log in');
@@ -180,10 +180,10 @@ exports.getProfile = async (req, res, next) => {
   const users = await userModel.find({});
 
   res.render('Admin/profile', {
-    videos : videos.length,
-    documents : documents.length ,
-    audios : audios.length,
-    users :  users.length,
+    videos: videos.length,
+    documents: documents.length,
+    audios: audios.length,
+    users: users.length,
     user,
     page_name: 'profile',
   });
@@ -318,39 +318,35 @@ exports.resetPassword = (req, res, next) => {
 };
 
 // 1.8 Settings
-exports.getInfoSettings = async (req, res, next) => {
+exports.getUpdateProfile = async (req, res, next) => {
 
   const user = await adminModel.findOne({
     admin_id: req.user
   })
 
-  return res.render('Admin/infoSettings', {
+  return res.render('Admin/updateProfile', {
     user: user,
     page_name: 'settings',
   });
 };
 
-exports.postInfoSettings = async (req, res, next) => {
-  const { old_email, email, name, password } = req.body;
+exports.postUpdateProfile = async (req, res, next) => {
+  console.log("req", req.body)
+  const { username, email, fname, mobile } = req.body;
 
-  const user = await adminModel.findOne({
-    email: old_email
+  const admin = await adminModel.findOne({
+    email: email
+  });
+
+  await adminModel.updateOne({
+    email: email
+  }, {
+    username, fname, mobile
   })
-  if (!(await bcrypt.compare(password, user.password))) {
-    req.flash('error_msg', 'Incorrect password');
-    return res.redirect('/admin/info_settings');
-  } else {
 
-    await adminModel.updateOne({
-      email: old_email
-    }, {
-      name: name,
-      email: email
-    })
 
-    req.flash('success_msg', 'Information Updated Successfully');
-    return res.redirect('/admin/info_settings');
-  }
+  req.flash('success_msg', 'Information Updated Successfully');
+  return res.redirect('/admin/edit_profile');
 };
 
 exports.getPasswordSettings = async (req, res, next) => {
@@ -368,9 +364,10 @@ exports.postPasswordSettings = async (req, res, next) => {
 
   const user = await adminModel.findOne({
     admin_id: req.user
-  })
+  });
+
   if (!(await bcrypt.compare(old_password, user.password))) {
-    req.flash('error_msg', 'Incorrect password');
+    req.flash('error_msg', 'Incorrect Old password');
     return res.redirect('/admin/password_settings');
   } else {
     const hashedPassword = await bcrypt.hash(new_password, 10);;
@@ -635,7 +632,7 @@ exports.getCategory = async (req, res, next) => {
 };
 exports.postAddCategory = async (req, res, next) => {
   const { cname } = req.body;
- 
+
   let isNamePresent = await categoryModel.findOne({
     cname: cname.toUpperCase()
   })
@@ -648,7 +645,7 @@ exports.postAddCategory = async (req, res, next) => {
   const category = await categoryModel.create({
     id: uuidv4(),
     cname: cname.toUpperCase(),
-    userId : req.user
+    userId: req.user
   })
 
   console.log('category', category);
@@ -658,22 +655,22 @@ exports.postAddCategory = async (req, res, next) => {
 };
 
 exports.getAllCategory = async (req, res, next) => {
-  console.log("user",req.user)
-  let data = await categoryModel.find({userId : req.user});
-  
+  console.log("user", req.user)
+  let data = await categoryModel.find({ userId: req.user });
+
   res.render('Admin/Category/getCategory', {
     data,
     page_name: 'category',
   });
-  
+
 };
 
 exports.deleteCategory = async (req, res, next) => {
 
   const id = req.params.id;
 
-  let checkCategory = await categoryModel.find({userId:req.user,id});
-  if(checkCategory.length == 0){
+  let checkCategory = await categoryModel.find({ userId: req.user, id });
+  if (checkCategory.length == 0) {
     req.flash('error', 'You Can"t Delete Category Of Other Admins');
     res.redirect('/admin/getCategory');
     return
@@ -824,18 +821,18 @@ exports.getAllVideo = async (req, res, next) => {
 
   let data = await videoModel.find({});
 
-  for(let i=0 ;i<data.length ;i++){
+  for (let i = 0; i < data.length; i++) {
     let date = data[i]['createdAt']
-    data[i]['uploadedAt'] = moment(date).format("ll"); 
+    data[i]['uploadedAt'] = moment(date).format("ll");
 
 
-    if(data[i]['visibility'] == "Public"){
+    if (data[i]['visibility'] == "Public") {
       data[i]['videoStatus'] = "Published"
-    }else{
+    } else {
       data[i]['videoStatus'] = "Uploaded"
     }
   }
-  
+
   res.render('Admin/Video/getVideos', {
     data,
     page_name: 'video',
@@ -846,7 +843,7 @@ exports.getAllVideo = async (req, res, next) => {
 exports.getVideo = async (req, res, next) => {
 
   const categories = await categoryModel.find({});
-  const visibility = [ "Public" , "Unlisted"]
+  const visibility = ["Public", "Unlisted"]
 
   res.render('Admin/Video/addVideo', {
     page_name: 'videos',
@@ -856,8 +853,8 @@ exports.getVideo = async (req, res, next) => {
 };
 
 exports.postVideo = async (req, res, next) => {
-  console.log("body", req.user , req.body);
-  let { videoName, description, category , visibility} = req.body;
+  console.log("body", req.user, req.body);
+  let { videoName, description, category, visibility } = req.body;
   let imageUrl;
   let videoUrl;
 
@@ -887,11 +884,11 @@ exports.postVideo = async (req, res, next) => {
       }
     }
 
- 
+
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect('/admin/addVideo'); 
+    res.redirect('/admin/addVideo');
   }
 
   let obj = {
@@ -902,9 +899,9 @@ exports.postVideo = async (req, res, next) => {
     imageUrl,
     videoUrl,
     visibility,
-    userId : req.user
+    userId: req.user
   };
-  console.log("obj",obj)
+  console.log("obj", obj)
   let result = await videoModel.create(obj);
 
   res.redirect('/admin/getAllVideo');
@@ -912,36 +909,36 @@ exports.postVideo = async (req, res, next) => {
 
 
 // 4.3 Modify existing classes
-exports.getEditVideo= async (req, res, next) => {
+exports.getEditVideo = async (req, res, next) => {
   const videoId = req.params.id;
 
   const videoData = await videoModel.find({
     id: videoId
   })
-  console.log("videoData",videoData);
+  console.log("videoData", videoData);
 
   const categories = await categoryModel.find({});
-  const visibility = [ "Public" , "Unlisted"];
+  const visibility = ["Public", "Unlisted"];
 
 
 
   res.render('Admin/Video/updateVideo', {
     categories,
     visibility,
-    videoData : videoData[0], 
+    videoData: videoData[0],
     page_name: 'videos',
   });
 };
 
 exports.postEditVideo = async (req, res, next) => {
-  console.log("body", req.user , req.body);
+  console.log("body", req.user, req.body);
   let videoId = req.params.id;
-  let { videoName, description, category , visibility} = req.body;
+  let { videoName, description, category, visibility } = req.body;
   let imageUrl;
 
-  let checkVideo =   await videoModel.findOne({ id : videoId , userId :req.user });
+  let checkVideo = await videoModel.findOne({ id: videoId, userId: req.user });
 
-  if(!checkVideo){
+  if (!checkVideo) {
     req.flash('error', 'You Can"t Update other admin video');
     res.redirect(`/admin/edit/video/${videoId}`);
   }
@@ -959,7 +956,7 @@ exports.postEditVideo = async (req, res, next) => {
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect(`/admin/edit/video/${videoId}`); 
+    res.redirect(`/admin/edit/video/${videoId}`);
   }
 
   let obj = {
@@ -969,11 +966,11 @@ exports.postEditVideo = async (req, res, next) => {
     visibility
   };
 
-  if(imageUrl){
+  if (imageUrl) {
     obj['imageUrl'] = imageUrl
   }
-  
-  console.log("obj",obj);
+
+  console.log("obj", obj);
 
   let udpadteVideo = await videoModel.updateOne({ id: videoId }, obj);
 
@@ -984,8 +981,8 @@ exports.postEditVideo = async (req, res, next) => {
 exports.deleteVideo = async (req, res, next) => {
   const id = req.params.id;
 
-  let checkVideo = await videoModel.find({userId:req.user,id});
-  if(checkVideo.length == 0){
+  let checkVideo = await videoModel.find({ userId: req.user, id });
+  if (checkVideo.length == 0) {
     req.flash('error', 'You Can"t Delete Video Of Other Admins');
     res.redirect('/admin/getAllVideo');
     return
@@ -1000,18 +997,18 @@ exports.deleteVideo = async (req, res, next) => {
 exports.getAllDoc = async (req, res, next) => {
   let data = await documentModel.find({});
 
-  for(let i=0 ;i<data.length ;i++){
+  for (let i = 0; i < data.length; i++) {
     let date = data[i]['createdAt']
-    data[i]['uploadedAt'] = moment(date).format("ll"); 
+    data[i]['uploadedAt'] = moment(date).format("ll");
 
 
-    if(data[i]['visibility'] == "Public"){
+    if (data[i]['visibility'] == "Public") {
       data[i]['docStatus'] = "Published"
-    }else{
+    } else {
       data[i]['docStatus'] = "Uploaded"
     }
   }
-  
+
   res.render('Admin/Document/getAllDoc', {
     data,
     page_name: 'documents',
@@ -1021,13 +1018,13 @@ exports.getAllDoc = async (req, res, next) => {
 // 5.2 Add department
 exports.getAddDoc = async (req, res, next) => {
   const categories = await categoryModel.find({});
-  const visibility = [ "Public" , "Unlisted"]
-  res.render('Admin/Document/addDoc', { page_name: 'documents', categories,visibility });
+  const visibility = ["Public", "Unlisted"]
+  res.render('Admin/Document/addDoc', { page_name: 'documents', categories, visibility });
 };
 
 exports.postAddDoc = async (req, res, next) => {
-  console.log("body", req.body , req.user);
-  let { fName, description, category ,visibility} = req.body;
+  console.log("body", req.body, req.user);
+  let { fName, description, category, visibility } = req.body;
   let imageUrl;
   let docUrl;
 
@@ -1060,7 +1057,7 @@ exports.postAddDoc = async (req, res, next) => {
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect('/admin/addVideo'); 
+    res.redirect('/admin/addVideo');
   }
 
   let obj = {
@@ -1071,7 +1068,7 @@ exports.postAddDoc = async (req, res, next) => {
     imageUrl,
     docUrl,
     visibility,
-    userId : req.user
+    userId: req.user
   };
 
   let result = await documentModel.create(obj);
@@ -1089,27 +1086,27 @@ exports.getEditFile = async (req, res, next) => {
   });
 
   const categories = await categoryModel.find({});
-  const visibility = [ "Public" , "Unlisted"];
+  const visibility = ["Public", "Unlisted"];
 
 
 
   res.render('Admin/Document/updateDoc', {
     categories,
     visibility,
-    docData : docData[0], 
+    docData: docData[0],
     page_name: 'documents',
   });
 };
 
 exports.postEditFile = async (req, res, next) => {
-  console.log("body", req.user , req.body);
+  console.log("body", req.user, req.body);
   let docId = req.params.id;
-  let { docName, description, category , visibility} = req.body;
+  let { docName, description, category, visibility } = req.body;
   let imageUrl;
 
-  let checkDoc =   await documentModel.findOne({ id : docId , userId :req.user });
+  let checkDoc = await documentModel.findOne({ id: docId, userId: req.user });
 
-  if(!checkDoc){
+  if (!checkDoc) {
     req.flash('error', 'You Can"t Update other admin pdf');
     res.redirect(`/admin/edit/file/${docId}`);
   }
@@ -1127,7 +1124,7 @@ exports.postEditFile = async (req, res, next) => {
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect(`/admin/edit/file/${docId}`); 
+    res.redirect(`/admin/edit/file/${docId}`);
   }
 
   let obj = {
@@ -1137,11 +1134,11 @@ exports.postEditFile = async (req, res, next) => {
     visibility
   };
 
-  if(imageUrl){
+  if (imageUrl) {
     obj['imageUrl'] = imageUrl
   }
-  
-  console.log("obj",obj);
+
+  console.log("obj", obj);
 
   let udpadteDoc = await documentModel.updateOne({ id: docId }, obj);
 
@@ -1153,8 +1150,8 @@ exports.postEditFile = async (req, res, next) => {
 exports.deleteFile = async (req, res, next) => {
   const id = req.params.id;
 
-  let checkFile = await documentModel.find({userId:req.user,id});
-  if(checkFile.length == 0){
+  let checkFile = await documentModel.find({ userId: req.user, id });
+  if (checkFile.length == 0) {
     req.flash('error', 'You Can"t Delete File Of Other Admins');
     res.redirect('/admin/getAllDoc');
     return
@@ -1167,26 +1164,26 @@ exports.deleteFile = async (req, res, next) => {
 // 6. COURSE
 // 6.1 Get all courses
 exports.getAllAudios = async (req, res, next) => {
-  console.log("user",req.user)
-  let data = await audioModel.find({userId : req.user});
+  console.log("user", req.user)
+  let data = await audioModel.find({ userId: req.user });
 
-  for(let i=0 ;i<data.length ;i++){
+  for (let i = 0; i < data.length; i++) {
     let date = data[i]['createdAt']
-    data[i]['uploadedAt'] = moment(date).format("ll"); 
+    data[i]['uploadedAt'] = moment(date).format("ll");
 
 
-    if(data[i]['visibility'] == "Public"){
+    if (data[i]['visibility'] == "Public") {
       data[i]['audioStatus'] = "Published"
-    }else{
+    } else {
       data[i]['audioStatus'] = "Uploaded"
     }
   }
-  
+
   res.render('Admin/Audio/getAudio', {
     data,
     page_name: 'audios',
   });
-  
+
 };
 
 
@@ -1240,7 +1237,7 @@ exports.postRelevantCourse = async (req, res, next) => {
 // 6.3 Add course
 exports.getAddAudio = async (req, res, next) => {
   const categories = await categoryModel.find({});
-  const visibility = [ "Public" , "Unlisted"]
+  const visibility = ["Public", "Unlisted"]
   res.render('Admin/Audio/addAudio', {
     categories,
     visibility,
@@ -1250,7 +1247,7 @@ exports.getAddAudio = async (req, res, next) => {
 
 exports.postAddAudio = async (req, res, next) => {
 
-  let { audioName, description, category ,visibility} = req.body;
+  let { audioName, description, category, visibility } = req.body;
   let imageUrl;
   let audioUrl;
 
@@ -1284,10 +1281,10 @@ exports.postAddAudio = async (req, res, next) => {
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect('/admin/addVideo'); 
+    res.redirect('/admin/addVideo');
   }
 
-  
+
   let obj = {
     id: uuidv4(),
     name: audioName,
@@ -1296,10 +1293,10 @@ exports.postAddAudio = async (req, res, next) => {
     imageUrl,
     audioUrl,
     visibility,
-    userId : req.user
+    userId: req.user
   };
 
-  console.log("obj",obj);
+  console.log("obj", obj);
 
   let result = await audioModel.create(obj);
 
@@ -1310,8 +1307,8 @@ exports.deleteAudio = async (req, res, next) => {
 
   const id = req.params.id;
 
-  let checkAudio = await audioModel.find({userId:req.user,id});
-  if(checkAudio.length == 0){
+  let checkAudio = await audioModel.find({ userId: req.user, id });
+  if (checkAudio.length == 0) {
     req.flash('error', 'You Can"t Delete Audio Of Other Admins');
     res.redirect('/admin/getAllAudios');
     return
@@ -1328,30 +1325,30 @@ exports.getEditAudio = async (req, res, next) => {
   const audioData = await audioModel.find({
     id: audioId
   })
-  console.log("audioData",audioData);
+  console.log("audioData", audioData);
 
   const categories = await categoryModel.find({});
-  const visibility = [ "Public" , "Unlisted"];
+  const visibility = ["Public", "Unlisted"];
 
 
 
   res.render('Admin/Audio/updateAudio', {
     categories,
     visibility,
-    audioData : audioData[0], 
+    audioData: audioData[0],
     page_name: 'audios',
   });
 };
 
 exports.postEditAudio = async (req, res, next) => {
-  console.log("body", req.user , req.body);
+  console.log("body", req.user, req.body);
   let audioId = req.params.id;
-  let { audioName, description, category , visibility} = req.body;
+  let { audioName, description, category, visibility } = req.body;
   let imageUrl;
 
-  let checkVideo =   await audioModel.findOne({ id : audioId , userId :req.user });
+  let checkVideo = await audioModel.findOne({ id: audioId, userId: req.user });
 
-  if(!checkVideo){
+  if (!checkVideo) {
     req.flash('error', 'You Can"t Update other admin Audio');
     res.redirect(`/admin/edit/audio/${audioId}`);
   }
@@ -1369,7 +1366,7 @@ exports.postEditAudio = async (req, res, next) => {
   } catch (error) {
     console.error('Error during file upload:', error);
     req.flash('error', 'File upload failed');
-    res.redirect(`/admin/edit/audio/${audioId}`); 
+    res.redirect(`/admin/edit/audio/${audioId}`);
   }
 
   let obj = {
@@ -1379,11 +1376,11 @@ exports.postEditAudio = async (req, res, next) => {
     visibility
   };
 
-  if(imageUrl){
+  if (imageUrl) {
     obj['imageUrl'] = imageUrl
   }
-  
-  console.log("obj",obj);
+
+  console.log("obj", obj);
 
   let udpadteAudio = await audioModel.updateOne({ id: audioId }, obj);
 
@@ -1507,16 +1504,16 @@ exports.postUploadImage = async (req, res, next) => {
   const imageFile = req.file;
   console.log(imageFile, "fille")
   // Create a reference to the video file in Firebase Storage.
-  
+
 };
 
 async function upload(fileData, path) {
   try {
     // Wrap the uploadStream events in promises for better handling
-   return new Promise((resolve, reject) => {
-    const fileRef = storageRef.file(path);
+    return new Promise((resolve, reject) => {
+      const fileRef = storageRef.file(path);
 
-    const uploadStream = fileRef.createWriteStream();
+      const uploadStream = fileRef.createWriteStream();
 
       uploadStream.on('error', (error) => {
         console.error('Upload error:', error);
@@ -1542,10 +1539,10 @@ async function upload(fileData, path) {
 
       // Write the file's buffer to Firebase Storage
       uploadStream.end(fileData.buffer);
-    }).then((result) =>{
+    }).then((result) => {
       return result
     }).catch((error) => {
-      console.log("123232323error",error)
+      console.log("123232323error", error)
     })
 
   } catch (error) {
@@ -1555,12 +1552,12 @@ async function upload(fileData, path) {
 }
 
 exports.allUsers = async (req, res, next) => {
-  console.log("user",req.user)
+  console.log("user", req.user)
   let data = await userModel.find({});
-  
+
   res.render('Admin/User/allUser', {
     data,
     page_name: 'users',
   });
-  
+
 };

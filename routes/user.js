@@ -16,6 +16,13 @@ router.post('/login', controller.postLogin);
 router.get('/register', controller.getRegister);
 router.post('/register', controller.postRegister);
 
+router.get('/edit_profile',requireAuth, controller.getUpdateProfile);
+router.post('/edit_profile',requireAuth, controller.postUpdateProfile);
+
+
+router.get('/password_settings', requireAuth, controller.getPasswordSettings);
+router.post('/password_settings', requireAuth, controller.postPasswordSettings);
+
 router.get('/logout', requireAuth, controller.getLogout)
 
 router.get('/dashboard', requireAuth, controller.getProfile);

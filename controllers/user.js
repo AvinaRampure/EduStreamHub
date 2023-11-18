@@ -326,3 +326,70 @@ exports.postRating = async (req, res, next) => {
     let addRating = await ratingModel.updateOne({ ['userId']: obj.userId, ['mediaId']: obj.mediaId }, obj, { upsert: true });
     res.status(200).send({ message: 'Rating added', data: addRating });
 };
+
+exports.getUpdateProfile = async (req, res, next) => {
+
+    console.log("here")
+    const user = await userModel.findOne({
+        user_id: req.user
+    })
+
+    return res.render('User/updateProfile', {
+        user: user,
+        page_name: 'settings',
+    });
+};
+
+exports.postUpdateProfile = async (req, res, next) => {
+
+    console.log("req", req.body)
+    const { username, email, fname, mobile } = req.body;
+
+    const user = await userModel.findOne({
+        email: email
+    });
+
+    await userModel.updateOne({
+        email: email
+    }, {
+        username, fname, mobile
+    })
+
+
+    req.flash('success_msg', 'Information Updated Successfully');
+    return res.redirect('/user/edit_profile');
+
+};
+
+exports.getPasswordSettings = async (req, res, next) => {
+    return res.render('User/passwordSettings', {
+        page_name: 'settings',
+    });
+};
+
+exports.postPasswordSettings = async (req, res, next) => {
+    const { old_password, new_password, confirm_new_password } = req.body;
+    if (new_password !== confirm_new_password) {
+      req.flash('error_msg', 'Passwords does not match');
+      return res.redirect('/user/password_settings');
+    }
+  
+    const user = await userModel.findOne({
+      user_id: req.user
+    });
+  
+    if (!(await bcrypt.compare(old_password, user.password))) {
+      req.flash('error_msg', 'Incorrect Old password');
+      return res.redirect('/user/password_settings');
+    } else {
+      const hashedPassword = await bcrypt.hash(new_password, 10);;
+  
+      await userModel.updateOne({
+        user_id: req.user
+      }, {
+        password: hashedPassword
+      })
+      req.flash('success_msg', 'Password Changed Successfully');
+      return res.redirect('/user/password_settings');
+    }
+  };

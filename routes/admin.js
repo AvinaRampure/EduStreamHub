@@ -37,8 +37,8 @@ router.get('/resetpassword/:id', forwardAuth, controller.getResetPassword);
 router.put('/resetpassword', forwardAuth, controller.resetPassword);
 
 // 1.8 Settings
-router.get('/info_settings', requireAuth, controller.getInfoSettings);
-router.post('/info_settings', requireAuth, controller.postInfoSettings);
+router.get('/edit_profile', requireAuth, controller.getUpdateProfile);
+router.post('/edit_profile', requireAuth, controller.postUpdateProfile);
 router.get('/password_settings', requireAuth, controller.getPasswordSettings);
 router.post('/password_settings', requireAuth, controller.postPasswordSettings);
 

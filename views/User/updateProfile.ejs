@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="../CSS/admin-dashboard.css">
 <div class="container-fluid">
     <div id="wrapper">
-        <%- include('../Includes/admin_nav.ejs') %>
+        <%- include('../Includes/user_nav.ejs') %>
         <section id="content-wrapper">
             <main role="main" class="pt-5 main">
                 <div class="main-content">
@@ -16,57 +16,62 @@
                                     <div class="card-header bg-white border-0">
                                         <div class="row align-items-center">
                                             <div class="col-8">
-                                                <h3 class="mb-0" style="color: brown;">ADMIN SETTINGS</h3>
+                                                <h3 class="mb-0" style="color: brown;">EDIT PROFILE</h3>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="card-body">
                                         <%- include('../Includes/messages') %>
-                                        <form action="/admin/info_settings" method="POST">
-                                            <h6 class="heading-small text-muted mb-4">Personal Information</h6>
+                                        <form action="/user/edit_profile" method="POST">
                                             <div class="pl-lg-4">
-                                                <div class="row">
-                                                    <input hidden value="<%= user.email %>" name="old_email" />
-                                                </div>
+                                              
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group">
-                                                            <input type="email" id="email" name="email"
+                                                            <label for="fname">Full Name <span style="color: red;">*</span></label>
+                                                            <input type="text" id="fname" name="fname"
                                                                 class="form-control form-control-alternative"
-                                                                value="<%= user.email %>" placeholder="Email" required>
+                                                                value="<%= user.fname %>" placeholder="Full Name" required>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group focused">
-                                                            <input type="text" id="name" name="name"
+                                                            <label for="username">Username <span style="color: red;">*</span></label>
+                                                            <input type="text" id="username" name="username"
                                                                 class="form-control form-control-alternative"
-                                                                value="<%= user.name %>" placeholder="Name" required>
+                                                                value="<%= user.username %>" placeholder="Username" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="email">Email <span style="color: red;">*</span></label>
+                                                            <input type="email" id="email" name="email"
+                                                                class="form-control form-control-alternative"
+                                                                value="<%= user.email %>" placeholder="Email" readonly="readonly" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                            <label for="mobile">Mobile <span style="color: red;">*</span></label>
+                                                            <input type="text" id="mobile" name="mobile"
+                                                                class="form-control form-control-alternative"
+                                                                value="<%= user.mobile %>" placeholder="Mobile" pattern="\d{10}" title="Please enter a 10-digit mobile number" required>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <hr class="my-4">
-                                            <h6 class="heading-small text-muted mb-4">Confirm Password</h6>
-                                            <div class="pl-lg-4">
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-                                                        <div class="form-group">
-                                                            <input type="password" name="password"
-                                                                class="form-control form-control-alternative"
-                                                                placeholder="Confirm Password" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <hr class="my-4">
-                                                <button type="submit" class="btn btn-primary btn-block">UPDATE
-                                                    INFORMATION</button>
+                                            <button type="submit" class="btn btn-primary btn-block">UPDATE INFORMATION</button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>

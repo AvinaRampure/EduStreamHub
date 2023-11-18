@@ -12,12 +12,11 @@ const db = mysql.createConnection({
 const selectID = (id) => {
   return new Promise(async (resolve, reject) => {
 
-
     const user = await userModel.findOne({
       user_id: id
     })
     if (user) return resolve(user);
-    else return reject(false);
+    else return resolve(false);
 
   });
 };
