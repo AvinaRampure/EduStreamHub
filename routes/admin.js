@@ -42,19 +42,6 @@ router.post('/edit_profile', requireAuth, controller.postUpdateProfile);
 router.get('/password_settings', requireAuth, controller.getPasswordSettings);
 router.post('/password_settings', requireAuth, controller.postPasswordSettings);
 
-// 2.STAFFS
-// 2.1 Add staff
-router.get('/addStaff', requireAuth, controller.getAddStaff);
-router.post('/addStaff', requireAuth, controller.postAddStaff);
-// 2.2 Get staffs on query
-router.get('/getStaff', requireAuth, controller.getRelevantStaff);
-router.post('/getStaff', requireAuth, controller.postRelevantStaff);
-// 2.3 Get all staffs
-router.get('/getAllStaffs', requireAuth, controller.getAllStaff);
-// 2.4 Modify existing staffs
-router.get('/settings/staff/:id', requireAuth, controller.getStaffSettings);
-router.post('/settings/staff', requireAuth, controller.postStaffSettings);
-router.get('/settings/deleteStaff/:id', requireAuth, controller.deleteStaff);
 
 // 3.STUDENTS
 // 3.1 Add Student
@@ -97,9 +84,7 @@ router.get('/edit/deleteFile/:id', requireAuth, controller.deleteFile);
 // 6.COURSES
 // 6.1 Get all courses
 router.get('/getAllAudios', requireAuth, controller.getAllAudios);
-// 6.2 Get courses on query
-router.get('/getCourse', requireAuth, controller.getRelevantCourse);
-router.post('/getCourse', requireAuth, controller.postRelevantCourse);
+
 // 6.3 Add course
 router.get('/addAudio', requireAuth, controller.getAddAudio);
 router.post('/addAudio', requireAuth,upload.any(), controller.postAddAudio);
@@ -107,12 +92,6 @@ router.post('/addAudio', requireAuth,upload.any(), controller.postAddAudio);
 router.get('/edit/audio/:id', requireAuth, controller.getEditAudio);
 router.post('/edit/audio/:id', requireAuth,upload.any() , controller.postEditAudio);
 router.get('/edit/deleteAudio/:id', requireAuth, controller.deleteAudio);
-
-// Qr Code
-router.get('/addExamTT',requireAuth, controller.getGenerateQr);
-router.post('/addExamTT',upload.single('videoFile'),requireAuth, controller.generateQr);
-router.get('/getExamTT',requireAuth, controller.getAllQr);
-router.get('/deleteExamTT',requireAuth, controller.deleteQr);
 
 
 //upload

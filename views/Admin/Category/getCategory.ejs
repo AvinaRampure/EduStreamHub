@@ -18,7 +18,7 @@
                                     <div class="card-body">
                                         <%- include('../../Includes/messages') %>
                                         <input class="form-control mb-4" id="searchInput" type="text"
-                                            placeholder="Search Video">
+                                            placeholder="Search Category">
                                         <div class="table-responsive">
                                             <table class="table">
                                                 <thead class="thead-dark">
@@ -28,7 +28,7 @@
                                                         <th scope="col">Delete Category</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="audioTable">
+                                                <tbody id="categoryTable">
                                                     <% for(let i=0; i < data.length; i++) { %>
                                                         <tr>
                                                             <th scope="row">
@@ -64,15 +64,15 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var searchInput = document.getElementById("searchInput");
-        var audioTable = document.getElementById("audioTable");
+        var categoryTable = document.getElementById("categoryTable");
 
         searchInput.addEventListener("keyup", function () {
             var searchText = searchInput.value.toLowerCase();
 
             // Loop through table rows
-            var rows = audioTable.getElementsByTagName("tr");
+            var rows = categoryTable.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) { // Start from 1 to skip the table header row
-                var titleCell = rows[i].getElementsByTagName("td")[1]; // Get the third cell (title)
+                var titleCell = rows[i].getElementsByTagName("td")[0]; // Get the third cell (title)
                 var title = titleCell.textContent.toLowerCase();
                 if (title.includes(searchText)) {
                     rows[i].style.display = "";

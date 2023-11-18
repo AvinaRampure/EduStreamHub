@@ -1012,7 +1012,6 @@ exports.postAddAudio = async (req, res, next) => {
       if (obj.fieldname == 'thumbnailFile') {
         let path = `images/${obj.originalname}`;
         const result = await upload(obj, path);
-        console.log(result);
         imageUrl = result;
       }
     }
