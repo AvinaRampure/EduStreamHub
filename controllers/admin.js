@@ -19,7 +19,8 @@ const categoryModel = require('../database/categoryModel')
 const documentModel = require('../database/documentModel')
 const audioModel = require('../database/audioModel');
 const userModel = require('../database/userModel');
-const questionModel = require('../database/questionModel')
+const questionModel = require('../database/questionModel');
+const ratingModel = require('../database/ratingModel')
 const QRCode = 0
 const { promisify } = require('util');
 
@@ -101,7 +102,7 @@ exports.getRegister = (req, res, next) => {
 };
 
 exports.postRegister = async (req, res, next) => {
-  console.log(req.body)
+
   const { fname, username, mobile, email, password, confirmPassword, securityQuestion, securityAnswer } = req.body;
   let errors = [];
 
@@ -331,7 +332,7 @@ exports.getUpdateProfile = async (req, res, next) => {
 };
 
 exports.postUpdateProfile = async (req, res, next) => {
-  console.log("req", req.body)
+
   const { username, email, fname, mobile } = req.body;
 
   const admin = await adminModel.findOne({
@@ -382,245 +383,6 @@ exports.postPasswordSettings = async (req, res, next) => {
   }
 };
 
-// 2. STAFFS
-// 2.1 Add staff
-exports.getAddStaff = async (req, res, next) => {
-  // const sql = 'SELECT dept_id from department';
-  const results = await departmentModel.find({}, { dept_id: 1 })
-
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  res.render('Admin/Staff/addStaff', {
-    departments: departments,
-    page_name: 'staff',
-  });
-};
-
-exports.postAddStaff = async (req, res, next) => {
-  const { email } = req.body;
-
-  const staff = await staffModel.findOne({
-    email: email
-  });
-  if (staff) {
-    req.flash('error', 'Staff with that email already exists');
-    res.redirect('/admin/addStaff');
-  } else {
-    const {
-      dob,
-      name,
-      gender,
-      department,
-      address,
-      city,
-      postalCode,
-      contact,
-    } = req.body;
-
-    if (contact.length > 10 && contact.length < 0) {
-      req.flash('error', 'Enter a valid phone number');
-      return res.redirect('/admin/addStaff');
-    }
-
-    const password = dob.toString().split('-').join('');
-    const hashedPassword = await bcrypt.hash(password, 8);
-
-
-    await staffModel.create({
-      st_id: uuidv4(),
-      st_name: name,
-      gender: gender,
-      dob: moment(dob).format(formate),
-      email: email,
-      st_address: `${address}-${city}-${postalCode}`,
-      contact: contact,
-      dept_id: department,
-      password: hashedPassword,
-    })
-    req.flash('success_msg', 'Staff added successfully');
-    res.redirect('/admin/getAllStaffs');
-  }
-};
-// 2.2 Get staffs on query
-exports.getRelevantStaff = async (req, res, next) => {
-  const results = await departmentModel.find({}, { dept_id: 1 });
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  res.render('Admin/Staff/selectStaff', {
-    departments: departments,
-    page_name: 'staff',
-  });
-};
-
-exports.postRelevantStaff = async (req, res, next) => {
-  const { section, department } = req.body;
-  if (department === 'None' && section !== '') {
-    req.flash('error', 'Please select department for the given section');
-    res.redirect('/admin/getStaff');
-  } else if (section !== '') {
-    // const sql1 =
-    //   'select max(section) as `max_section` from student where dept_id = ?';
-    // const max_section = (await queryParamPromise(sql1, [department]))[0]
-    //   .max_section;
-    const max_section = await studentModel.find({
-      dept_id: department
-    }).sort({ section: -1 })[0]
-
-    if (max_section !== null && section <= max_section) {
-      // All teachers from given section and department
-      // const sql2 = 'select c_id from course where dept_id = ?';
-      // let course_ids = await queryParamPromise(sql2, [department]);
-      let course_ids = await courseModel.find({
-        dept_id: department
-      }, { _id: 0, c_id: 1 });
-
-      if (course_ids.length === 0) {
-        return res.render('Admin/Staff/getStaff', {
-          data: [],
-          page_name: 'staff',
-        });
-      }
-      const courses = [];
-      for (const course_id of course_ids) {
-        courses.push(course_id.c_id);
-      }
-      // const sql3 = 'select st_id from class where section = ? and c_id in (?)';
-      // const staff_ids = await queryParamPromise(sql3, [section, courses]);
-      const staff_ids = await classModel.find({
-        section: section,
-        c_id: {
-          $in: courses
-        }
-      }, {
-        _id: 0,
-        st_id: 1
-      })
-
-      if (staff_ids.length === 0) {
-        return res.render('Admin/Staff/getStaff', {
-          data: [],
-          page_name: 'staff',
-        });
-      }
-      const staffs = [];
-      for (const staff_id of staff_ids) {
-        staffs.push(staff_id.st_id);
-      }
-      // const sql4 = 'select * from staff where st_id in (?)';
-      // const results = await queryParamPromise(sql4, [staffs]);
-      const results = await staffModel.find({
-        st_id: {
-          $in: staffs
-        }
-      })
-      return res.render('Admin/Staff/getStaff', {
-        data: results,
-        page_name: 'staff',
-      });
-    } else {
-      // section for the given department does not exist
-      req.flash('error', 'Section for the given department does not exist');
-      res.redirect('/admin/getStaff');
-    }
-  } else if (department !== 'None') {
-    // All teachers from particular department
-    // const sql = 'select * from staff where dept_id = ?';
-    // const results = await queryParamPromise(sql, [department]);
-    const results = await staffModel.find({
-      dept_id: department
-    })
-    return res.render('Admin/Staff/getStaff', {
-      data: results,
-      page_name: 'staff',
-    });
-  } else {
-    return res.redirect('/admin/getAllStaffs');
-  }
-
-};
-
-// 2.3 Get all staffs
-exports.getAllStaff = async (req, res, next) => {
-  const results = await staffModel.find({})
-  res.render('Admin/Staff/getStaff', { data: results, page_name: 'staff' });
-};
-
-exports.deleteStaff = async (req, res, next) => {
-  const staffEmail = req.params.id;
-
-  await staffModel.deleteOne({
-    email: staffEmail
-  });
-  res.redirect('/admin/getAllStaffs');
-}
-// 2.4 Modify existing staffs
-exports.getStaffSettings = async (req, res, next) => {
-  const staffEmail = req.params.id;
-
-  const staffData = await staffModel.findOne({ email: staffEmail });
-  const address = staffData.st_address.split('-');
-  staffData.address = address;
-  const results = await departmentModel.find({})
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  res.render('Admin/Staff/setStaff', {
-    staffData: staffData,
-    departments: departments,
-    page_name: 'Staff Settings',
-  });
-};
-exports.postStaffSettings = async (req, res, next) => {
-  const {
-    old_email,
-    email,
-    dob,
-    name,
-    gender,
-    department,
-    address,
-    city,
-    postalCode,
-    contact,
-  } = req.body;
-
-  const password = dob.toString().split('-').join('');
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  await staffModel.updateOne({
-    email: old_email
-  }, {
-    email: email,
-    dob: dob,
-    st_name: name,
-    gender: gender,
-    st_address: address + '-' + city + '-' + postalCode,
-    contact: contact,
-    dept_id: department,
-    password: hashedPassword
-  })
-
-  const sql =
-    'update staff set st_name=?, gender=?, dob=?, email=?, st_address=?, contact=?, password=?, dept_id=? where email=?';
-  await queryParamPromise(sql, [
-    name,
-    gender,
-    dob,
-    email,
-    address + '-' + city + '-' + postalCode,
-    contact,
-    hashedPassword,
-    department,
-    old_email,
-  ]);
-  req.flash('success_msg', 'Staff added successfully');
-  res.redirect('/admin/getStaff');
-};
 
 // 3. STUDENTS
 // 3.1 Add student
@@ -648,14 +410,12 @@ exports.postAddCategory = async (req, res, next) => {
     userId: req.user
   })
 
-  console.log('category', category);
-
   req.flash('success_msg', 'Student added successfully');
   res.redirect('/admin/profile');
 };
 
 exports.getAllCategory = async (req, res, next) => {
-  console.log("user", req.user)
+
   let data = await categoryModel.find({ userId: req.user });
 
   res.render('Admin/Category/getCategory', {
@@ -819,7 +579,7 @@ exports.postStudentSettings = async (req, res, next) => {
 // 4.1 Select Class
 exports.getAllVideo = async (req, res, next) => {
 
-  let data = await videoModel.find({});
+  let data = await videoModel.find({userId : req.user});
 
   for (let i = 0; i < data.length; i++) {
     let date = data[i]['createdAt']
@@ -831,6 +591,21 @@ exports.getAllVideo = async (req, res, next) => {
     } else {
       data[i]['videoStatus'] = "Uploaded"
     }
+
+    let ratings = await ratingModel.find({ mediaId: data[i].id });
+    let sum = 0
+    let averageRating = 0
+
+    if (ratings.length) {
+        for (let obj of ratings) {
+            sum += obj.rating
+        }
+
+        averageRating = sum / ratings.length;
+    }
+    data[i]['rating'] = averageRating;
+    data[i]['ratingCount'] = ratings.length
+
   }
 
   res.render('Admin/Video/getVideos', {
@@ -853,7 +628,7 @@ exports.getVideo = async (req, res, next) => {
 };
 
 exports.postVideo = async (req, res, next) => {
-  console.log("body", req.user, req.body);
+
   let { videoName, description, category, visibility } = req.body;
   let imageUrl;
   let videoUrl;
@@ -901,7 +676,6 @@ exports.postVideo = async (req, res, next) => {
     visibility,
     userId: req.user
   };
-  console.log("obj", obj)
   let result = await videoModel.create(obj);
 
   res.redirect('/admin/getAllVideo');
@@ -915,7 +689,6 @@ exports.getEditVideo = async (req, res, next) => {
   const videoData = await videoModel.find({
     id: videoId
   })
-  console.log("videoData", videoData);
 
   const categories = await categoryModel.find({});
   const visibility = ["Public", "Unlisted"];
@@ -970,7 +743,6 @@ exports.postEditVideo = async (req, res, next) => {
     obj['imageUrl'] = imageUrl
   }
 
-  console.log("obj", obj);
 
   let udpadteVideo = await videoModel.updateOne({ id: videoId }, obj);
 
@@ -1177,6 +949,20 @@ exports.getAllAudios = async (req, res, next) => {
     } else {
       data[i]['audioStatus'] = "Uploaded"
     }
+
+    let ratings = await ratingModel.find({ mediaId: data[i].id });
+    let sum = 0
+    let averageRating = 0
+
+    if (ratings.length) {
+        for (let obj of ratings) {
+            sum += obj.rating
+        }
+
+        averageRating = sum / ratings.length;
+    }
+    data[i]['rating'] = averageRating;
+    data[i]['ratingCount'] = ratings.length
   }
 
   res.render('Admin/Audio/getAudio', {
@@ -1186,53 +972,6 @@ exports.getAllAudios = async (req, res, next) => {
 
 };
 
-
-// 6.2 Get courses on query
-exports.getRelevantCourse = async (req, res, next) => {
-  const results = await departmentModel.find({});
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  res.render('Admin/Audio/deptSelect', {
-    departments: departments,
-    page_name: 'courses',
-  });
-};
-
-exports.postRelevantCourse = async (req, res, next) => {
-  let { semester, department } = req.body;
-  if (!semester && department === 'None') {
-    const results = await courseModel.find({});
-    res.render('Admin/Audio/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  } else if (!semester) {
-
-    const results = await courseModel.find({ dept_id: department });
-    res.render('Admin/Audio/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  } else if (department === 'None') {
-
-    const results = await courseModel.find({ semester: semester });
-    res.render('Admin/Audio/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  } else if (semester && department !== 'None') {
-    // const sql =
-    //   'SELECT * FROM course WHERE semester = ? AND dept_id = ? GROUP BY c_id';
-    // const results = await queryParamPromise(sql, [semester, department]);
-    // const results = await courseModel.find({semester:semester,dept_id:department}).sort({c_id:1});
-    res.render('Admin/Audio/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  }
-};
 
 // 6.3 Add course
 exports.getAddAudio = async (req, res, next) => {
@@ -1388,79 +1127,6 @@ exports.postEditAudio = async (req, res, next) => {
   res.redirect('/admin/getAllAudios');
 };
 
-
-// QR Code
-
-exports.generateQr = async (req, res, next) => {
-  const { name, department, year } = req.body
-
-  const extension = req.file.filename.split('.')[1]
-  var newPath = `public\\files\\${name}.${extension}`
-  console.log(req.file)
-
-  await fs.rename(req.file.path, newPath, function (err) {
-    if (err) throw err;
-    console.log('File Renamed.');
-  });
-
-  var path = newPath.split("\\") //[public,files,file.txt]
-  path.shift(); //[files,file.txt]
-  path = path.join("\\")
-
-
-  const results = QRCode.toFile(`public/Qr/${name}.png`, `http://localhost:4000/${path}`, {
-    errorCorrectionLevel: 'H'
-  }, function (err, data) {
-    if (err) throw err;
-    console.log(data)
-    console.log('QR code saved!');
-  });
-
-  path = `Qr\\${name}.png`
-
-  await timeTableModel.create({
-    name,
-    dept_id: department,
-    year,
-    path: path,
-  })
-
-  res.redirect('/admin/getExamTT');
-}
-
-exports.getGenerateQr = async (req, res, next) => {
-  const results = await departmentModel.find({}, { dept_id: 1 })
-
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  let year = ["First Year", "Second Year", "Third Year", "Forth Year"]
-
-  res.render('Admin/Exam/addExamTT', {
-    years: year,
-    departments: departments,
-    page_name: 'examTimeTable',
-  });
-}
-
-exports.getAllQr = async (req, res, next) => {
-
-  const data = await timeTableModel.find({});
-
-  res.render('Admin/Exam/getExamQr', {
-    data,
-    page_name: 'examTimeTable',
-  });
-
-}
-
-exports.deleteQr = async (req, res, next) => {
-
-  const name = req.query.name;
-  await timeTableModel.deleteOne({ name });
-  res.redirect('/admin/getExamTT');
-}
 
 exports.postUpload = async (req, res, next) => {
   const videoFile = req.file;

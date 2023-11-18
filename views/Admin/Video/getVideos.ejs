@@ -27,6 +27,7 @@
                                                         <th scope="col">Video</th>
                                                         <th scope="col">Title</th>
                                                         <th scope="col">Visibility</th>
+                                                        <th scope="col">Ratings</th>
                                                         <th scope="col">Date</th>
                                                         <th scope="col">Edit Video</th>
                                                     </tr>
@@ -52,6 +53,7 @@
                                                                     <%= data[i].visibility %>
                                                                 <% } %>
                                                             </td>
+                                                            <td><%= data[i].rating.toFixed(1) %> (<%= data[i].ratingCount%> Users)</td>
                                                             <td>
                                                                 <%= data[i].uploadedAt %>
                                                                 <br>
