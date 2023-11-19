@@ -126,7 +126,7 @@ exports.getProfile = async (req, res, next) => {
     for (let i = 0; i < audio.length; i++) {
 
         let author = await adminModel.findOne({ admin_id: audio[i].userId });
-        console.log("author", author)
+
         audio[i]['author'] = author.username
     }
 
@@ -136,7 +136,7 @@ exports.getProfile = async (req, res, next) => {
     for (let i = 0; i < doc.length; i++) {
 
         let author = await adminModel.findOne({ admin_id: doc[i].userId });
-        console.log("author", author)
+
         doc[i]['author'] = author.username
     }
 
