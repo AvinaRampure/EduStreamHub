@@ -110,7 +110,7 @@ exports.postRegister = async (req, res, next) => {
 
 exports.getProfile = async (req, res, next) => {
 
-    let video = await videoModel.find({}).limit(10).
+    let video = await videoModel.find({visibility : "Public"}).limit(10).
         sort({ createdAt: 1 });
 
     for (let i = 0; i < video.length; i++) {

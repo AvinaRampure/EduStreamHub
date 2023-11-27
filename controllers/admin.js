@@ -4,16 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const moment = require('moment')
 const uuidv4 = require('uuid').v4;
-const mailgun = require('mailgun-js');
-const DOMAIN = process.env.DOMAIN_NAME;
-const mg = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: DOMAIN });
 const adminModel = require('../database/adminModel');
-const departmentModel = 0
-const classModel = 0
-const studentModel = 0
-const staffModel = 0
-const courseModel = 0
-const timeTableModel = 0
 const videoModel = require('../database/videoModel')
 const categoryModel = require('../database/categoryModel')
 const documentModel = require('../database/documentModel')
@@ -21,15 +12,14 @@ const audioModel = require('../database/audioModel');
 const userModel = require('../database/userModel');
 const questionModel = require('../database/questionModel');
 const ratingModel = require('../database/ratingModel')
-const QRCode = 0
-const { promisify } = require('util');
+
 
 
 const formate = "YYYY-MM-DD"
 
 const admin = require('firebase-admin');
 const serviceAccount = require('../utils/edustream-hub-firebase-adminsdk-rru81-b5c6445df6.json');
-const { error } = require('console');
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -190,135 +180,7 @@ exports.getProfile = async (req, res, next) => {
   });
 };
 
-// 1.6 Forgot Password
-exports.getForgotPassword = (req, res, next) => {
-  res.render('Admin/forgotPassword');
-};
 
-exports.forgotPassword = async (req, res, next) => {
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).render('Admin/forgotPassword');
-  }
-
-  let errors = [];
-
-  const results = await adminModel.findOne({
-    email: email
-  })
-  if (!results || results.length === 0) {
-    errors.push({ msg: 'That email is not registered!' });
-    res.status(401).render('Admin/forgotPassword', {
-      errors,
-    });
-  }
-
-  const token = jwt.sign(
-    { _id: results.admin_id },
-    process.env.RESET_PASSWORD_KEY,
-    { expiresIn: '20m' }
-  );
-
-  const data = {
-    from: 'noreplyCMS@mail.com',
-    to: email,
-    subject: 'Reset Password Link',
-    html: `<h2>Please click on given link to reset your password</h2>
-                <p><a href="${process.env.URL}/admin/resetpassword/${token}">Reset Password</a></p>
-                <hr>
-                <p><b>The link will expire in 20m!</b></p>
-              `,
-  };
-
-  const reset = await adminModel.updateOne({
-    email: email
-  }, { resetLink: token })
-
-  if (!reset) {
-    errors.push({ msg: 'Error In ResetLink' });
-    res.render('Admin/forgotPassword', { errors });
-  }
-
-  const mgdata = mg.messages().send(data, (err, body) => {
-    if (err) throw err;
-    else return body
-  })
-
-  if (mgdata) {
-    req.flash('success_msg', 'Reset Link Sent Successfully!');
-    res.redirect('/admin/resetPassword');
-  }
-
-  // const sql2 = 'UPDATE admin SET resetLink = ? WHERE email = ?';
-  // db.query(sql2, [token, email], (err, success) => {
-  //   if (err) {
-  //     errors.push({ msg: 'Error In ResetLink' });
-  //     res.render('Admin/forgotPassword', { errors });
-  //   } else {
-  //     mg.messages().send(data, (err, body) => {
-  //       if (err) throw err;
-  //       else {
-  //         req.flash('success_msg', 'Reset Link Sent Successfully!');
-  //         res.redirect('/admin/forgot-password');
-  //       }
-  //     });
-  //   }
-  // });
-};
-
-// 1.7 Reset Password
-exports.getResetPassword = (req, res, next) => {
-  const resetLink = req.params.id;
-  res.render('Admin/resetPassword', { resetLink });
-};
-
-exports.resetPassword = (req, res, next) => {
-  const { resetLink, password, confirmPass } = req.body;
-
-  let errors = [];
-
-  if (password !== confirmPass) {
-    req.flash('error_msg', 'Passwords do not match!');
-    res.redirect(`/admin/resetpassword/${resetLink}`);
-  } else {
-    if (resetLink) {
-      jwt.verify(resetLink, process.env.RESET_PASSWORD_KEY, async (err, data) => {
-        if (err) {
-          errors.push({ msg: 'Token Expired!' });
-          res.render('Admin/resetPassword', { errors });
-        } else {
-          const link = await adminModel.findOne({
-            resetLink: resetLink
-          })
-
-          if (!link) {
-            errors.push({ msg: 'reset link not found' });
-            res.render('Admin/resetPassword', { errors });
-          }
-          let hashed = await bcrypt.hash(password, 10);
-          const update_password = await adminModel.updateOne({
-            password: hashed
-          }, {
-            resetLink: resetLink
-          })
-
-          if (update_password) {
-            req.flash(
-              'success_msg',
-              'Password Changed Successfully! Login Now'
-            );
-            res.redirect('/admin/login');
-          }
-        }
-      });
-    } else {
-      errors.push({ msg: 'Authentication Error' });
-      res.render('Admin/resetPassword', { errors });
-    }
-  }
-};
-
-// 1.8 Settings
 exports.getUpdateProfile = async (req, res, next) => {
 
   const user = await adminModel.findOne({
@@ -384,8 +246,6 @@ exports.postPasswordSettings = async (req, res, next) => {
 };
 
 
-// 3. STUDENTS
-// 3.1 Add student
 exports.getCategory = async (req, res, next) => {
 
   res.render('Admin/Category/addCategory', {
@@ -410,7 +270,7 @@ exports.postAddCategory = async (req, res, next) => {
     userId: req.user
   })
 
-  req.flash('success_msg', 'Student added successfully');
+  req.flash('success_msg', 'Category added successfully');
   res.redirect('/admin/profile');
 };
 
@@ -440,143 +300,9 @@ exports.deleteCategory = async (req, res, next) => {
   res.redirect('/admin/getCategory');
 
 }
-// 3.2 Get students on query
-exports.getRelevantStudent = async (req, res, next) => {
 
-  const results = await departmentModel.find({});
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  let year = ["First Year", "Second Year", "Third Year", "Forth Year"]
 
-  res.render('Admin/Student/deptSelect', {
-    years: year,
-    departments: departments,
-    page_name: 'students',
-  });
-};
 
-exports.postRelevantStudent = async (req, res, next) => {
-  let { year, department } = req.body;
-  if (year === 'None' && department === 'None') {
-    const results = await studentModel.find({});
-
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  } else if (year == "None") {
-
-    const results = await studentModel.find({ dept_id: department });
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  } else if (department === 'None') {
-    const results = await studentModel.find({ year: year });
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  } else if (year != 'None' && department != 'None') {
-
-    const results = await studentModel.find({
-      year: year,
-      dept_id: department
-    })
-
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  }
-};
-
-// 3.3 Get all students
-exports.getAllStudent = async (req, res, next) => {
-
-  const results = await studentModel.find({});
-  res.render('Admin/Student/getStudent', {
-    data: results,
-    page_name: 'students',
-  });
-};
-
-// 3.4 Modify existing students
-exports.getStudentSettings = async (req, res, next) => {
-  const studentEmail = req.params.id;
-  const studentData = await studentModel.find({ email: studentEmail });
-  const address = studentData[0].s_address.split('-');
-  studentData[0].address = address;
-  const results = await departmentModel.find({});
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  res.render('Admin/Student/setStudent', {
-    studentData: studentData,
-    departments: departments,
-    page_name: 'students',
-  });
-};
-
-exports.deleteStudent = async (req, res, next) => {
-  const studentEmail = req.params.id;
-
-  await studentModel.deleteOne({
-    email: studentEmail
-  });
-  res.redirect('/admin/getStudent');
-}
-
-exports.postStudentSettings = async (req, res, next) => {
-  const {
-    old_email,
-    email,
-    dob,
-    name,
-    gender,
-    department,
-    address,
-    city,
-    postalCode,
-    contact,
-  } = req.body;
-  const password = dob.toString().split('-').join('');
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const sql1 =
-    'select count(*) as `count`, section from student where section = (select max(section) from student where dept_id = ?) AND dept_id = ?';
-  const results = await queryParamPromise(sql1, [department, department]);
-  let section = 1;
-  if (results[0].count !== 0) {
-    if (results[0].count == SECTION_LIMIT) {
-      section = results[0].section + 1;
-    } else {
-      section = results[0].section;
-    }
-  }
-  const sql2 =
-    'UPDATE STUDENT SET s_name = ?, gender = ?, dob = ?,email = ?, s_address = ?, contact = ?, password = ?, section = ?, dept_id = ? WHERE email = ?';
-  await queryParamPromise(sql2, [
-    name,
-    gender,
-    dob,
-    email,
-    address + '-' + city + '-' + postalCode,
-    contact,
-    hashedPassword,
-    section,
-    department,
-    old_email,
-  ]);
-  req.flash('success_msg', 'Student updated successfully');
-  res.redirect('/admin/getAllStudents');
-};
-
-// 4. CLASSES
-
-// 4.1 Select Class
 exports.getAllVideo = async (req, res, next) => {
 
   let data = await videoModel.find({userId : req.user});
@@ -614,7 +340,7 @@ exports.getAllVideo = async (req, res, next) => {
   });
 };
 
-// 4.2 Add class
+
 exports.getVideo = async (req, res, next) => {
 
   const categories = await categoryModel.find({});
@@ -682,7 +408,6 @@ exports.postVideo = async (req, res, next) => {
 };
 
 
-// 4.3 Modify existing classes
 exports.getEditVideo = async (req, res, next) => {
   const videoId = req.params.id;
 
@@ -764,8 +489,7 @@ exports.deleteVideo = async (req, res, next) => {
   res.redirect('/admin/getAllVideo');
 }
 
-// 5. DEPARTMENTS
-// 5.1 Select department
+
 exports.getAllDoc = async (req, res, next) => {
   let data = await documentModel.find({});
 
@@ -787,7 +511,7 @@ exports.getAllDoc = async (req, res, next) => {
   });
 };
 
-// 5.2 Add department
+
 exports.getAddDoc = async (req, res, next) => {
   const categories = await categoryModel.find({});
   const visibility = ["Public", "Unlisted"]
@@ -849,7 +573,7 @@ exports.postAddDoc = async (req, res, next) => {
   res.redirect('/admin/getAllDoc');
 };
 
-// 5.3 Modify existing department
+
 exports.getEditFile = async (req, res, next) => {
   const docId = req.params.id;
 
@@ -933,8 +657,6 @@ exports.deleteFile = async (req, res, next) => {
   res.redirect('/admin/getAllDoc');
 }
 
-// 6. COURSE
-// 6.1 Get all courses
 exports.getAllAudios = async (req, res, next) => {
   console.log("user", req.user)
   let data = await audioModel.find({ userId: req.user });
@@ -973,7 +695,6 @@ exports.getAllAudios = async (req, res, next) => {
 };
 
 
-// 6.3 Add course
 exports.getAddAudio = async (req, res, next) => {
   const categories = await categoryModel.find({});
   const visibility = ["Public", "Unlisted"]
@@ -1056,7 +777,7 @@ exports.deleteAudio = async (req, res, next) => {
   res.redirect('/admin/getAllAudios');
 
 }
-// 6.4 Modify existing courses
+
 exports.getEditAudio = async (req, res, next) => {
   const audioId = req.params.id;
 
